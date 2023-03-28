@@ -1,3 +1,6 @@
+mod tokenizer;
+
 pub fn execute(val: &str) -> String {
-    return val.to_string();
+    let _tokens = tokenizer::tokenize(val);
+    return String::from("Hello, world!");
 }
