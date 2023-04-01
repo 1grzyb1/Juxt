@@ -1,23 +1,25 @@
+use std::ffi::c_double;
+use crate::engine::tokenizer::{TagStatus, Token, TokenType};
+
 #[cfg(test)]
 mod tree_builder_tests;
 
-use crate::engine::tokenizer::{TagStatus, Token, TokenType};
-
 #[derive(PartialEq)]
 #[derive(Debug)]
-struct Node {
+pub struct Node {
     token_type: TokenType,
     token_value: String,
     content: Option<Vec<Node>>,
 }
 
-fn build_tree(tokens: &Vec<Token>) -> Vec<Node> {
+pub fn build_tree(tokens: &Vec<Token>) -> Vec<Node> {
     let mut nodes = Vec::new();
     let mut i = 0;
     while i < tokens.len() {
         let token = tokens.get(i).unwrap().clone();
         let (new_i, node) = match token.tag_status {
-            TagStatus::Open => tree(i, tokens),
+            TagStatus::Open => tree(i, tokens, 1.0),
+            TagStatus::Close => panic!("Unexpected close tag: {:?}", token),
             _ => (i + 1, Node {
                 token_type:
                 tokens.get(i).unwrap().clone().token_type,
@@ -31,12 +33,13 @@ fn build_tree(tokens: &Vec<Token>) -> Vec<Node> {
     return nodes;
 }
 
-fn tree(current_index: usize, tokens: &Vec<Token>) -> (usize, Node) {
+fn tree(current_index: usize, tokens: &Vec<Token>, open_tags: f32) -> (usize, Node) {
     let mut content_nodes = Vec::new();
 
     let mut i = current_index + 1;
 
     while i < tokens.len() {
+        let mut curr_open_tags = open_tags;
         let token = tokens.get(i).unwrap().clone();
 
         if token.tag_status == TagStatus::Close &&
@@ -50,10 +53,17 @@ fn tree(current_index: usize, tokens: &Vec<Token>) -> (usize, Node) {
         }
 
         if token.tag_status == TagStatus::Open {
-            let (new_index, contents) = tree(i, tokens);
+            let (new_index, contents) = tree(i, tokens, curr_open_tags + 1.0);
             i = new_index;
             content_nodes.push(contents);
             continue;
+        }
+
+        if token.tag_status == TagStatus::Close {
+            curr_open_tags -= 1.0;
+            if curr_open_tags < 0.0 {
+                panic!("Unexpected close tag: {:?}", token);
+            }
         }
 
         content_nodes.push(Node {

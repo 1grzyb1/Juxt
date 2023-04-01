@@ -14,6 +14,38 @@ fn build_one_element_tree() {
     assert_eq!(nodes[0].content, None);
 }
 
+
+#[test]
+#[should_panic]
+fn panic_when_only_closing_tag() {
+    let tokens = vec![Token {
+        value: String::from(""),
+        token_type: TokenType::Each,
+        tag_status: TagStatus::Close,
+    }];
+    build_tree(&tokens);
+}
+
+#[test]
+#[should_panic]
+fn panic_when_open_tag_and_two_closing() {
+    let tokens = vec![Token {
+        value: String::from(""),
+        token_type: TokenType::Each,
+        tag_status: TagStatus::Open,
+    }, Token {
+        value: String::from(""),
+        token_type: TokenType::Each,
+        tag_status: TagStatus::Close,
+    },Token {
+        value: String::from(""),
+        token_type: TokenType::Each,
+        tag_status: TagStatus::Close,
+    }
+    ];
+    build_tree(&tokens);
+}
+
 #[test]
 fn build_nested_tree() {
     let tokens = vec![Token {

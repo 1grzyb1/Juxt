@@ -25,9 +25,9 @@ pub enum TagStatus {
 #[derive(Clone)]
 #[derive(Debug)]
 pub struct Token {
-    pub(crate) value: String,
-    pub(crate) token_type: TokenType,
-    pub(crate) tag_status: TagStatus,
+    pub value: String,
+    pub token_type: TokenType,
+    pub tag_status: TagStatus,
 }
 
 pub fn tokenize(val: &str) -> Vec<Token> {
