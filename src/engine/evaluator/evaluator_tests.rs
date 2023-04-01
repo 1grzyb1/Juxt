@@ -29,3 +29,18 @@ fn parse_content_and_function() {
     let result = eval(&nodes);
     assert_eq!(result, "Hello World=test");
 }
+
+#[test]
+fn parse_each() {
+    let nodes = vec![Node {
+        token_type: TokenType::Each,
+        token_value: "n in [1, 2, 3]".to_string(),
+        content: Option::from(vec![Node {
+            token_type: TokenType::Content,
+            token_value: "test".to_string(),
+            content: None,
+        }]),
+    }];
+    let result = eval(&nodes);
+    assert_eq!(result, "testtesttest");
+}
