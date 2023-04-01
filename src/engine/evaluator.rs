@@ -62,5 +62,6 @@ fn each_replacement(id: &String, node: &Node) -> String {
 
     let map_function_name = generate(6, "abcdefghijklmnopqrstuvwxyz");
     let mut map_function = generate_js(&map_function_name.to_string(), each[0], &node.content.as_ref().unwrap());
-    return format!("{} \n content = content.replace(`{}`, {})", map_function, id, format!("{}.map({} => {}({})).join('')", each[1], each[0], map_function_name, each[0]));
+    let map = format!("{}.map({} => {}({})).join('')", each[1], each[0], map_function_name, each[0]);
+    return format!("{} \n content = content.replace(`{}`, {})", map_function, id, map);
 }
