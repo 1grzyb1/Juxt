@@ -19,9 +19,13 @@ pub fn eval(nodes: &Vec<Node>) -> String {
 fn parse_tree(nodes: &Vec<Node>) -> String {
     let mut replecments = Vec::new();
     let mut content = String::new();
+    let mut scripts = String::new();
 
     for node in nodes {
         match node.token_type {
+            TokenType::Script => {
+                scripts.push_str(&node.token_value);
+            }
             TokenType::Content => {
                 content.push_str(&node.token_value);
             }
@@ -34,7 +38,8 @@ fn parse_tree(nodes: &Vec<Node>) -> String {
         }
     }
 
-    let mut js = format!("let content = '{}'\n", content);
+
+    let mut js = format!("{} \n let content = '{}'\n", scripts, content);
     for replecment in replecments {
         js.push_str(format!("{}\n", &replecment).as_str());
     }
@@ -42,5 +47,5 @@ fn parse_tree(nodes: &Vec<Node>) -> String {
 }
 
 fn fn_replacment(id: &str, replacment: &str) -> String {
-    return format!("content = content.replace({}, {})", id, replacment);
+    return format!("content = content.replace(`{}`, {})", id, replacment);
 }

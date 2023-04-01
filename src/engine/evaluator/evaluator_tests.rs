@@ -11,17 +11,21 @@ fn parse_content() {
     assert_eq!(result, "Hello World");
 }
 
-// #[test]
+#[test]
 fn parse_content_and_function() {
     let nodes = vec![Node {
+        token_type: TokenType::Script,
+        token_value: "function test() { return 'test' }".to_string(),
+        content: None,
+    }, Node {
         token_type: TokenType::Content,
         token_value: "Hello World=".to_string(),
         content: None,
-    },Node {
+    }, Node {
         token_type: TokenType::Function,
-        token_value: "function()".to_string(),
+        token_value: "test()".to_string(),
         content: None,
     }];
-    let result = parse_tree(&nodes);
-    assert_eq!(result, "function execute(context) { \n let content = 'Hello World'\n \n return content \n }");
+    let result = eval(&nodes);
+    assert_eq!(result, "Hello World=test");
 }
