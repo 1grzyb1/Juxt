@@ -1,5 +1,10 @@
+
+#[cfg(test)]
+mod tokenizer_tests;
+
 #[derive(PartialEq)]
 #[derive(Debug)]
+#[derive(Clone)]
 pub enum TokenType {
     Import,
     Script,
@@ -10,12 +15,15 @@ pub enum TokenType {
 
 #[derive(PartialEq)]
 #[derive(Debug)]
+#[derive(Clone)]
 pub enum TagStatus {
     Open,
     Close,
     Undefined,
 }
 
+#[derive(Clone)]
+#[derive(Debug)]
 pub struct Token {
     value: String,
     token_type: TokenType,
@@ -30,7 +38,36 @@ pub fn tokenize(val: &str) -> Vec<Token> {
         tokens.push(token);
         pointer = new_pointer;
     }
-    return tokens;
+
+    return concat_content(&tokens);
+}
+
+fn concat_content(tokens: &Vec<Token>) -> Vec<Token> {
+    let mut concatinated: Vec<Token> = Vec::new();
+    let mut i = 0;
+    while  i < tokens.len() {
+        let token = tokens.get(i).unwrap().clone();
+        if token.token_type != TokenType::Content {
+            concatinated.push(token);
+            i += 1;
+            continue;
+        }
+
+        let mut concat_value = Vec::new();
+        concat_value.push(token.value);
+        i += 1;
+        while i < tokens.len() && tokens.get(i).unwrap().token_type == TokenType::Content  {
+            concat_value.push(tokens.get(i).unwrap().value.clone());
+            i += 1;
+        }
+
+        concatinated.push(Token {
+            value: concat_value.join(""),
+            token_type: TokenType::Content,
+            tag_status: TagStatus::Undefined,
+        })
+    }
+    return concatinated;
 }
 
 fn next_token(pointer: usize, val: &str) -> (usize, Token) {
@@ -123,105 +160,3 @@ fn get_char_at(pointer: usize, val: &str) -> char {
     return val.chars().nth(pointer).unwrap();
 }
 
-#[test]
-fn should_tokenize_content() {
-    let tokens = tokenize("some test");
-    assert_eq!(tokens.len(), 1);
-    assert_eq!(tokens[0].value, "some test");
-    assert_eq!(tokens[0].token_type, TokenType::Content);
-    assert_eq!(tokens[0].tag_status, TagStatus::Undefined);
-}
-
-#[test]
-fn should_tokenize_import() {
-    let tokens = tokenize("{#import component.flux}");
-    assert_eq!(tokens.len(), 1);
-    assert_eq!(tokens[0].value, "component.flux");
-    assert_eq!(tokens[0].token_type, TokenType::Import);
-    assert_eq!(tokens[0].tag_status, TagStatus::Open);
-}
-
-#[test]
-fn should_tokenize_import_and_content() {
-    let tokens = tokenize("{#import component.flux} blbablb");
-    assert_eq!(tokens.len(), 2);
-    assert_eq!(tokens[0].value, "component.flux");
-    assert_eq!(tokens[0].token_type, TokenType::Import);
-    assert_eq!(tokens[0].tag_status, TagStatus::Open);
-
-    assert_eq!(tokens[1].value, " blbablb");
-    assert_eq!(tokens[1].token_type, TokenType::Content);
-    assert_eq!(tokens[1].tag_status, TagStatus::Undefined);
-}
-
-#[test]
-fn should_tokenize_script_and_content() {
-    let tokens = tokenize("{#script}");
-    assert_eq!(tokens.len(), 1);
-    assert_eq!(tokens[0].value, "");
-    assert_eq!(tokens[0].token_type, TokenType::Script);
-    assert_eq!(tokens[0].tag_status, TagStatus::Open);
-
-    let tokens = tokenize("{# script  }");
-    assert_eq!(tokens.len(), 1);
-    assert_eq!(tokens[0].value, "");
-    assert_eq!(tokens[0].token_type, TokenType::Script);
-    assert_eq!(tokens[0].tag_status, TagStatus::Open);
-}
-
-#[test]
-fn should_tokenize_open_cloased_and_content() {
-    let tokens = tokenize("{#script} bigos bigos {/script}");
-    assert_eq!(tokens.len(), 3);
-    assert_eq!(tokens[0].value, "");
-    assert_eq!(tokens[0].token_type, TokenType::Script);
-    assert_eq!(tokens[0].tag_status, TagStatus::Open);
-
-    assert_eq!(tokens[1].value, " bigos bigos ");
-    assert_eq!(tokens[1].token_type, TokenType::Content);
-    assert_eq!(tokens[1].tag_status, TagStatus::Undefined);
-
-    assert_eq!(tokens[2].value, "");
-    assert_eq!(tokens[2].token_type, TokenType::Script);
-    assert_eq!(tokens[2].tag_status, TagStatus::Close);
-}
-
-#[test]
-fn big_boy_test() {
-    let tokens = tokenize("{#import component.flux}
-
-{#script}
-    console.log(context.value);
-    function getPort() {
-        return 80;
-    }
-{/script}
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: my-service
-spec:
-  ports:
-    {#each port in [0, 1, 2]}
-    - protocol: TCP
-      port: {#fn port}
-      targetPort: {#fn getPort()}
-    {/each}
-   {#fn component(10)}");
-
-    assert_eq!(tokens.len(), 16);
-    assert_eq!(tokens[0].value, "component.flux");
-    assert_eq!(tokens[0].token_type, TokenType::Import);
-    assert_eq!(tokens[0].tag_status, TagStatus::Open);
-
-    assert_eq!(tokens[1].token_type, TokenType::Content);
-
-    assert_eq!(tokens[2].token_type, TokenType::Script);
-    assert_eq!(tokens[2].tag_status, TagStatus::Open);
-
-    assert_eq!(tokens[3].token_type, TokenType::Content);
-
-    assert_eq!(tokens[4].token_type, TokenType::Script);
-    assert_eq!(tokens[4].tag_status, TagStatus::Close);
-}
