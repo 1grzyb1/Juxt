@@ -1,5 +1,6 @@
 mod tokenizer;
 mod tree_builder;
+mod tree_parser;
 
 pub fn execute(val: &str) -> String {
     let tokens = tokenizer::tokenize(val);

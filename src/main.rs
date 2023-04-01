@@ -1,5 +1,6 @@
 mod engine;
 
 fn main() {
-    println!("{}", engine::execute("Hello, world!"));
+    let result = engine::execute("asdasda");
+    println!("{}", result);
 }

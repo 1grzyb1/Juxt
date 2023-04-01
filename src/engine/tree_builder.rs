@@ -7,9 +7,9 @@ mod tree_builder_tests;
 #[derive(PartialEq)]
 #[derive(Debug)]
 pub struct Node {
-    token_type: TokenType,
-    token_value: String,
-    content: Option<Vec<Node>>,
+    pub token_type: TokenType,
+    pub token_value: String,
+    pub content: Option<Vec<Node>>,
 }
 
 pub fn build_tree(tokens: &Vec<Token>) -> Vec<Node> {
