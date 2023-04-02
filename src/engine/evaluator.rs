@@ -26,7 +26,7 @@ fn generate_js(fn_name: &str, param: &str, nodes: &Vec<Node>) -> String {
     for node in nodes {
         match node.token_type {
             TokenType::Script => {
-                scripts.push_str(&node.token_value);
+                scripts.push_str(&script_replacement(node));
             }
             TokenType::Content => {
                 content.push_str(&node.token_value);
@@ -46,11 +46,23 @@ fn generate_js(fn_name: &str, param: &str, nodes: &Vec<Node>) -> String {
     }
 
 
-    let mut js = format!("{} \n let content = '{}'\n", scripts, content);
+    let mut js = format!("{} \n let content = `{}`\n", scripts, content);
     for replecment in replecments {
         js.push_str(format!("{}\n", &replecment).as_str());
     }
     return format!("function {}({}) {{ \n {} \n return content \n }}", fn_name, param, js);
+}
+
+fn script_replacement(node: &Node) -> String {
+    let mut content = Vec::new();
+    for content_node in node.content.as_ref().unwrap() {
+        if content_node.token_type != TokenType::Content {
+            panic!("Script tag can only contain content");
+        }
+
+        content.push(content_node.token_value.clone());
+    }
+    return content.join("");
 }
 
 fn fn_replacement(id: &str, replacment: &str) -> String {

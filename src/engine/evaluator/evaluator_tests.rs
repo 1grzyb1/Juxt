@@ -15,8 +15,12 @@ fn parse_content() {
 fn parse_content_and_function() {
     let nodes = vec![Node {
         token_type: TokenType::Script,
-        token_value: "function test() { return 'test' }".to_string(),
-        content: None,
+        token_value: "".to_string(),
+        content: Option::from(vec![Node {
+            token_type: TokenType::Content,
+            token_value: "function test() { return 'test' }".to_string(),
+            content: None,
+        }]),
     }, Node {
         token_type: TokenType::Content,
         token_value: "Hello World=".to_string(),
@@ -49,8 +53,12 @@ fn parse_each() {
 fn parse_each_with_function() {
     let nodes = vec![Node {
         token_type: TokenType::Script,
-        token_value: "function test(n) { return 'test' + n }".to_string(),
-        content: None,
+        token_value: "".to_string(),
+        content: Option::from(vec![Node {
+            token_type: TokenType::Content,
+            token_value: "function test(n) { return 'test' + n }".to_string(),
+            content: None,
+        }]),
     }, Node {
         token_type: TokenType::Each,
         token_value: "n in [1, 2, 3]".to_string(),
