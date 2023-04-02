@@ -1,4 +1,4 @@
-use js_sandbox::{Script, AnyError};
+use js_sandbox::{Script};
 use uuid::Uuid;
 use crate::engine::tokenizer::TokenType;
 use crate::engine::tree_builder::Node;
@@ -73,7 +73,7 @@ fn each_replacement(id: &String, node: &Node) -> String {
     let each: Vec<&str> = node.token_value.split(" in ").collect();
 
     let map_function_name = generate(6, "abcdefghijklmnopqrstuvwxyz");
-    let mut map_function = generate_js(&map_function_name.to_string(), each[0], &node.content.as_ref().unwrap());
+    let map_function = generate_js(&map_function_name.to_string(), each[0], &node.content.as_ref().unwrap());
     let map = format!("{}.map({} => {}({})).join('')", each[1], each[0], map_function_name, each[0]);
     return format!("{} \n content = content.replace(`{}`, {})", map_function, id, map);
 }
