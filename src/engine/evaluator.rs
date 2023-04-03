@@ -1,5 +1,4 @@
 use js_sandbox::{Script};
-use uuid::Uuid;
 use crate::engine::tokenizer::TokenType;
 use crate::engine::tree_builder::Node;
 use random_string::generate;
@@ -19,7 +18,7 @@ pub fn eval(nodes: &Vec<Node>) -> String {
 }
 
 fn generate_js(fn_name: &str, param: &str, nodes: &Vec<Node>) -> String {
-    let mut replecments = Vec::new();
+    let mut functions = Vec::new();
     let mut content = String::new();
     let mut scripts = String::new();
 
@@ -32,14 +31,12 @@ fn generate_js(fn_name: &str, param: &str, nodes: &Vec<Node>) -> String {
                 content.push_str(&node.token_value);
             }
             TokenType::Function => {
-                let id = Uuid::new_v4().to_string();
-                content.push_str(&id);
-                replecments.push(fn_replacement(&id, &node.token_value));
+                content.push_str(&format!("${{{}}}", node.token_value));
             }
             TokenType::Each => {
-                let id = Uuid::new_v4().to_string();
-                content.push_str(&id);
-                replecments.push(each_replacement(&id, &node));
+                let (map, map_function) = each_replacement(node);
+                functions.push(map_function);
+                content.push_str(&format!("${{{}}}", map));
             }
             _ => println!("Not implemented yet"),
         }
@@ -47,8 +44,8 @@ fn generate_js(fn_name: &str, param: &str, nodes: &Vec<Node>) -> String {
 
 
     let mut js = format!("{} \n let content = `{}`\n", scripts, content);
-    for replecment in replecments {
-        js.push_str(format!("{}\n", &replecment).as_str());
+    for function in functions {
+        js.push_str(format!("{}\n", &function).as_str());
     }
     return format!("function {}({}) {{ \n {} \n return content \n }}", fn_name, param, js);
 }
@@ -69,11 +66,11 @@ fn fn_replacement(id: &str, replacment: &str) -> String {
     return format!("content = content.replace(`{}`, {})", id, replacment);
 }
 
-fn each_replacement(id: &String, node: &Node) -> String {
+fn each_replacement(node: &Node) -> (String, String) {
     let each: Vec<&str> = node.token_value.split(" in ").collect();
 
     let map_function_name = generate(6, "abcdefghijklmnopqrstuvwxyz");
     let map_function = generate_js(&map_function_name.to_string(), each[0], &node.content.as_ref().unwrap());
     let map = format!("{}.map({} => {}({})).join('')", each[1], each[0], map_function_name, each[0]);
-    return format!("{} \n content = content.replace(`{}`, {})", map_function, id, map);
+    return (map, map_function);
 }

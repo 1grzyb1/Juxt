@@ -2,12 +2,11 @@ mod engine;
 
 fn main() {
     let result = engine::execute("{#script}
-    console.log(context.value);
+    console.log(context);
     function getPort() {
         return 80;
     }
 {/script}
-
 apiVersion: v1
 kind: Service
 metadata:
@@ -17,7 +16,7 @@ spec:
     {#each port in [0, 1, 2]}
     - protocol: TCP
       port: ${port}
-      targetPort: {#fn getPort()}
+      targetPort: ${getPort()}
     {/each}");
     println!("{}", result);
 }
