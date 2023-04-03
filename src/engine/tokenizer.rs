@@ -1,4 +1,3 @@
-
 #[cfg(test)]
 mod tokenizer_tests;
 
@@ -39,13 +38,48 @@ pub fn tokenize(val: &str) -> Vec<Token> {
         pointer = new_pointer;
     }
 
-    return concat_content(&tokens);
+    let concat = concat_content(&tokens);
+    return clear_whitespace(concat);
+}
+
+fn clear_whitespace(tokens: Vec<Token>) -> Vec<Token> {
+    let mut cleared: Vec<Token> = Vec::new();
+    for (i, token) in tokens.iter().enumerate() {
+        if i >= tokens.len() - 1 || (token.token_type != TokenType::Content &&
+            tokens.get(i + 1).unwrap().token_type != TokenType::Content) {
+            cleared.push(token.clone());
+            continue;
+        }
+
+        let mut value = token.value.clone();
+        let mut last_pop = String::from("");
+
+        while value.ends_with(" ") || value.ends_with("\t") || value.ends_with("\r") || value.ends_with("\n") {
+            let pop = value.pop();
+            if pop.is_none() || pop.unwrap() == '\n' {
+                last_pop = String::from(pop.unwrap());
+                break;
+            }
+        }
+
+        if last_pop == "\n" {
+            cleared.push(Token {
+                value: value,
+                token_type: token.token_type.clone(),
+                tag_status: token.tag_status.clone(),
+            });
+            continue;
+        }
+
+        cleared.push(token.clone());
+    }
+    return cleared;
 }
 
 fn concat_content(tokens: &Vec<Token>) -> Vec<Token> {
     let mut concatinated: Vec<Token> = Vec::new();
     let mut i = 0;
-    while  i < tokens.len() {
+    while i < tokens.len() {
         let token = tokens.get(i).unwrap().clone();
         if token.token_type != TokenType::Content {
             concatinated.push(token);
@@ -56,7 +90,7 @@ fn concat_content(tokens: &Vec<Token>) -> Vec<Token> {
         let mut concat_value = Vec::new();
         concat_value.push(token.value);
         i += 1;
-        while i < tokens.len() && tokens.get(i).unwrap().token_type == TokenType::Content  {
+        while i < tokens.len() && tokens.get(i).unwrap().token_type == TokenType::Content {
             concat_value.push(tokens.get(i).unwrap().value.clone());
             i += 1;
         }
