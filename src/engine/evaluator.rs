@@ -6,8 +6,7 @@ use random_string::generate;
 #[cfg(test)]
 mod evaluator_tests;
 
-pub fn eval(nodes: &Vec<Node>) -> String {
-    let js_code = generate_js("execute", "context", nodes);
+pub fn eval(js_code: &str) -> String {
     println!("{}", js_code);
     let mut script = Script::from_string(&js_code).unwrap();
 
@@ -17,8 +16,8 @@ pub fn eval(nodes: &Vec<Node>) -> String {
     return result;
 }
 
-fn generate_js(fn_name: &str, param: &str, nodes: &Vec<Node>) -> String {
-    let mut functions = Vec::new();
+pub fn generate_js(fn_name: &str, param: &str, nodes: &Vec<Node>, functions: Vec<String>) -> String {
+    let mut functions = functions;
     let mut content = String::new();
     let mut scripts = String::new();
 
@@ -70,7 +69,7 @@ fn each_replacement(node: &Node) -> (String, String) {
     let each: Vec<&str> = node.token_value.split(" in ").collect();
 
     let map_function_name = generate(6, "abcdefghijklmnopqrstuvwxyz");
-    let map_function = generate_js(&map_function_name.to_string(), each[0], &node.content.as_ref().unwrap());
+    let map_function = generate_js(&map_function_name.to_string(), each[0], &node.content.as_ref().unwrap(), Vec::new());
     let map = format!("{}.map({} => {}({})).join('')", each[1], each[0], map_function_name, each[0]);
     return (map, map_function);
 }
