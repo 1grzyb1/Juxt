@@ -22,7 +22,7 @@ port: ${getPort()}";
         name: "main".to_string(),
         template: template.to_string(),
     }, Vec::new());
-    assert_eq!(result, "\nport: 80");
+    assert_eq!(result, "port: 80");
 }
 
 #[test]
@@ -34,7 +34,7 @@ fn test_each() {
         name: "main".to_string(),
         template: template.to_string(),
     }, Vec::new());
-    assert_eq!(result, "\n      port: 0\n      port: 1\n      port: 2");
+    assert_eq!(result, "      port: 0\n          port: 1\n          port: 2\n    ");
 }
 
 #[test]
@@ -51,7 +51,7 @@ fn test_function_each() {
         name: "main".to_string(),
         template: template.to_string(),
     }, Vec::new());
-    assert_eq!(result, "\n      port: 1\n      port: 2\n      port: 3");
+    assert_eq!(result, "          port: 1\n          port: 2\n          port: 3\n    ");
 }
 
 #[test]
@@ -67,5 +67,5 @@ fn test_import() {
         name: "main".to_string(),
         template: template.to_string(),
     }, vec!(component));
-    assert_eq!(result, "\n    Hello world");
+    assert_eq!(result, "    Hello world");
 }

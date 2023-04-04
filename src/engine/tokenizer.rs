@@ -45,8 +45,28 @@ pub fn tokenize(val: &str) -> Vec<Token> {
 fn clear_whitespace(tokens: Vec<Token>) -> Vec<Token> {
     let mut cleared: Vec<Token> = Vec::new();
     for (i, token) in tokens.iter().enumerate() {
-        if i >= tokens.len() - 1 || (token.token_type != TokenType::Content &&
-            tokens.get(i + 1).unwrap().token_type != TokenType::Content) {
+
+        if i > 0 && token.token_type == TokenType::Content &&
+            tokens.get(i - 1).unwrap().token_type != TokenType::Content {
+            let mut value = token.value.clone();
+            if token.value.starts_with('\n') {
+                value = value[1..].parse().unwrap();
+            }
+            cleared.push(Token {
+                value,
+                token_type: token.token_type.clone(),
+                tag_status: token.tag_status.clone(),
+            });
+            continue;
+        }
+
+        if i >= tokens.len() - 1 {
+            cleared.push(token.clone());
+            continue;
+        }
+
+        if  token.token_type != TokenType::Content &&
+            tokens.get(i + 1).unwrap().token_type != TokenType::Content {
             cleared.push(token.clone());
             continue;
         }
