@@ -6,7 +6,9 @@ use random_string::generate;
 #[cfg(test)]
 mod evaluator_tests;
 
-pub fn eval(js_code: &str) -> String {
+pub fn eval(nodes: &Vec<Node>) -> String {
+    let js_code = generate_js("execute", "context", nodes);
+    println!("{}", js_code);
     let mut script = Script::from_string(&js_code).unwrap();
 
     let arg = 7;
@@ -15,18 +17,13 @@ pub fn eval(js_code: &str) -> String {
     return result;
 }
 
-pub fn generate_js(fn_name: &str, param: &str, nodes: &Vec<Node>,
-                   provider: &dyn Fn(&str, &str) -> String) -> String {
+fn generate_js(fn_name: &str, param: &str, nodes: &Vec<Node>) -> String {
     let mut functions = Vec::new();
     let mut content = String::new();
     let mut scripts = String::new();
 
     for node in nodes {
         match node.token_type {
-            TokenType::Import => {
-                let import_name = node.token_value.split(".").collect::<Vec<&str>>()[0];
-                scripts.push_str(&provider(&node.token_value, import_name));
-            }
             TokenType::Script => {
                 scripts.push_str(&script_replacement(node));
             }
@@ -73,11 +70,7 @@ fn each_replacement(node: &Node) -> (String, String) {
     let each: Vec<&str> = node.token_value.split(" in ").collect();
 
     let map_function_name = generate(6, "abcdefghijklmnopqrstuvwxyz");
-    let map_function = generate_js(&map_function_name.to_string(), each[0], &node.content.as_ref().unwrap(), &empty_provider);
+    let map_function = generate_js(&map_function_name.to_string(), each[0], &node.content.as_ref().unwrap());
     let map = format!("{}.map({} => {}({})).join('')", each[1], each[0], map_function_name, each[0]);
     return (map, map_function);
-}
-
-fn empty_provider(_: &str, _: &str) -> String {
-    return "".to_string();
 }
