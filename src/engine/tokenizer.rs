@@ -8,7 +8,6 @@ pub enum TokenType {
     Import,
     Script,
     Each,
-    Function,
     Content,
 }
 
@@ -180,7 +179,6 @@ fn match_type(type_token: &str) -> TokenType {
         "import" => TokenType::Import,
         "script" => TokenType::Script,
         "each" => TokenType::Each,
-        "fn" => TokenType::Function,
         _ => TokenType::Content,
     }
 }

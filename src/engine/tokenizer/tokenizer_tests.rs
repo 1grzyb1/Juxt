@@ -82,12 +82,12 @@ spec:
   ports:
     {#each port in [0, 1, 2]}
     - protocol: TCP
-      port: {#fn port}
-      targetPort: {#fn getPort()}
+      port: {$port}
+      targetPort: {$getPort()}
     {/each}
-   {#fn component(10)}");
+   {$component(10)}");
 
-    assert_eq!(tokens.len(), 15);
+    assert_eq!(tokens.len(), 10);
     assert_eq!(tokens[0].value, "component.flux");
     assert_eq!(tokens[0].token_type, TokenType::Import);
     assert_eq!(tokens[0].tag_status, TagStatus::Open);
@@ -109,20 +109,8 @@ spec:
 
     assert_eq!(tokens[7].token_type, TokenType::Content);
 
-    assert_eq!(tokens[8].token_type, TokenType::Function);
-    assert_eq!(tokens[8].tag_status, TagStatus::Open);
+    assert_eq!(tokens[8].token_type, TokenType::Each);
+    assert_eq!(tokens[8].tag_status, TagStatus::Close);
 
     assert_eq!(tokens[9].token_type, TokenType::Content);
-
-    assert_eq!(tokens[10].token_type, TokenType::Function);
-
-    assert_eq!(tokens[11].token_type, TokenType::Content);
-
-    assert_eq!(tokens[12].token_type, TokenType::Each);
-    assert_eq!(tokens[12].tag_status, TagStatus::Close);
-
-    assert_eq!(tokens[13].token_type, TokenType::Content);
-
-    assert_eq!(tokens[14].token_type, TokenType::Function);
-    assert_eq!(tokens[14].tag_status, TagStatus::Open);
 }

@@ -23,11 +23,7 @@ fn parse_content_and_function() {
         }]),
     }, Node {
         token_type: TokenType::Content,
-        token_value: "Hello World=".to_string(),
-        content: None,
-    }, Node {
-        token_type: TokenType::Function,
-        token_value: "test()".to_string(),
+        token_value: "Hello World=${test()}".to_string(),
         content: None,
     }];
     let result = eval(&generate_js("execute", "context", &nodes, Vec::new()));
@@ -63,8 +59,8 @@ fn parse_each_with_function() {
         token_type: TokenType::Each,
         token_value: "n in [1, 2, 3]".to_string(),
         content: Option::from(vec![Node {
-            token_type: TokenType::Function,
-            token_value: "test(n)".to_string(),
+            token_type: TokenType::Content,
+            token_value: "${test(n)}".to_string(),
             content: None,
         }]),
     }];

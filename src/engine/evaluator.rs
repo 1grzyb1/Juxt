@@ -29,9 +29,6 @@ pub fn generate_js(fn_name: &str, param: &str, nodes: &Vec<Node>, functions: Vec
             TokenType::Content => {
                 content.push_str(&node.token_value);
             }
-            TokenType::Function => {
-                content.push_str(&format!("${{{}}}", node.token_value));
-            }
             TokenType::Each => {
                 let (map, map_function) = each_replacement(node);
                 functions.push(map_function);
@@ -59,10 +56,6 @@ fn script_replacement(node: &Node) -> String {
         content.push(content_node.token_value.clone());
     }
     return content.join("");
-}
-
-fn fn_replacement(id: &str, replacment: &str) -> String {
-    return format!("content = content.replace(`{}`, {})", id, replacment);
 }
 
 fn each_replacement(node: &Node) -> (String, String) {

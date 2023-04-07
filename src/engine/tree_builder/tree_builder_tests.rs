@@ -164,7 +164,7 @@ fn build_double_nested_tree_without_close_tag_with_two_open() {
         tag_status: TagStatus::Open,
     }, Token {
         value: String::from(""),
-        token_type: TokenType::Function,
+        token_type: TokenType::Content,
         tag_status: TagStatus::Open,
     },Token {
         value: String::from(""),
@@ -186,7 +186,7 @@ fn build_double_nested_tree_without_close_tag_with_two_open() {
 
     let content = nodes[1].content.as_ref().unwrap();
     assert_eq!(content.len(), 2);
-    assert_eq!(content[0].token_type, TokenType::Function);
+    assert_eq!(content[0].token_type, TokenType::Content);
     assert_eq!(content[1].token_type, TokenType::Content);
 }
 
@@ -202,11 +202,11 @@ fn build_double_nested_tree_without_close_tag_with_two_roots() {
         tag_status: TagStatus::Open,
     }, Token {
         value: String::from(""),
-        token_type: TokenType::Function,
+        token_type: TokenType::Content,
         tag_status: TagStatus::Open,
     },Token {
         value: String::from(""),
-        token_type: TokenType::Function,
+        token_type: TokenType::Content,
         tag_status: TagStatus::Open,
     }, Token {
         value: String::from(""),
@@ -224,6 +224,6 @@ fn build_double_nested_tree_without_close_tag_with_two_roots() {
 
     let content = nodes[1].content.as_ref().unwrap();
     assert_eq!(content.len(), 2);
-    assert_eq!(content[0].token_type, TokenType::Function);
-    assert_eq!(content[1].token_type, TokenType::Function);
+    assert_eq!(content[0].token_type, TokenType::Content);
+    assert_eq!(content[1].token_type, TokenType::Content);
 }
