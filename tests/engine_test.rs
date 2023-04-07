@@ -69,3 +69,51 @@ fn test_import() {
     }, vec!(component));
     assert_eq!(result, "    Hello world");
 }
+
+#[test]
+fn test_if() {
+    let template = "{#if 1 == 1}\
+    asd\
+    {/if}";
+    let result = compile_and_execute(Juxt {
+        name: "main".to_string(),
+        template: template.to_string(),
+    }, Vec::new());
+    assert_eq!(result, "asd");
+
+    let template = "{#if 1 != 1}\
+    asd\
+    {/if}";
+    let result = compile_and_execute(Juxt {
+        name: "main".to_string(),
+        template: template.to_string(),
+    }, Vec::new());
+    assert_eq!(result, "");
+}
+
+#[test]
+fn test_if_else() {
+    let template = "{#if 1 === 1}\
+    asd\
+    {/if}\
+    {#else}\
+    dsa\
+    {/else}";
+    let result = compile_and_execute(Juxt {
+        name: "main".to_string(),
+        template: template.to_string(),
+    }, Vec::new());
+    assert_eq!(result, "asd");
+
+    let template = "{#if 1 !== 1}\
+    asd\
+    {/if}\
+    {#else}\
+    dsa\
+    {/else}";
+    let result = compile_and_execute(Juxt {
+        name: "main".to_string(),
+        template: template.to_string(),
+    }, Vec::new());
+    assert_eq!(result, "dsa");
+}

@@ -64,6 +64,24 @@ fn should_tokenize_open_cloased_and_content() {
 }
 
 #[test]
+fn should_tokenize_if() {
+    let tokens = tokenize("{#if 1 == 1} bigos bigos {/if}");
+    assert_eq!(tokens.len(), 3);
+    assert_eq!(tokens[0].value, "1 == 1");
+    assert_eq!(tokens[0].token_type, TokenType::If);
+    assert_eq!(tokens[0].tag_status, TagStatus::Open);
+
+    assert_eq!(tokens[1].value, " bigos bigos ");
+    assert_eq!(tokens[1].token_type, TokenType::Content);
+    assert_eq!(tokens[1].tag_status, TagStatus::Undefined);
+
+    assert_eq!(tokens[2].value, "");
+    assert_eq!(tokens[2].token_type, TokenType::If);
+    assert_eq!(tokens[2].tag_status, TagStatus::Close);
+}
+
+
+#[test]
 fn big_boy_test() {
     let tokens = tokenize("{#import component.flux}
 

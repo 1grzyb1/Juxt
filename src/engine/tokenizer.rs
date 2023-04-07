@@ -9,6 +9,8 @@ pub enum TokenType {
     Script,
     Each,
     Content,
+    If,
+    Else,
 }
 
 #[derive(PartialEq)]
@@ -179,6 +181,8 @@ fn match_type(type_token: &str) -> TokenType {
         "import" => TokenType::Import,
         "script" => TokenType::Script,
         "each" => TokenType::Each,
+        "if" => TokenType::If,
+        "else" => TokenType::Else,
         _ => TokenType::Content,
     }
 }

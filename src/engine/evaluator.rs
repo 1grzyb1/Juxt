@@ -21,7 +21,7 @@ pub fn generate_js(fn_name: &str, param: &str, nodes: &Vec<Node>, functions: Vec
     let mut content = String::new();
     let mut scripts = String::new();
 
-    for node in nodes {
+    for (i, node) in nodes.iter().enumerate() {
         match node.token_type {
             TokenType::Script => {
                 scripts.push_str(&script_replacement(node));
@@ -34,6 +34,15 @@ pub fn generate_js(fn_name: &str, param: &str, nodes: &Vec<Node>, functions: Vec
                 functions.push(map_function);
                 content.push_str(&format!("${{{}}}", map));
             }
+            TokenType::If => {
+                let (condition, condition_function, else_function) = if_replacement(i, nodes);
+                functions.push(condition_function);
+                functions.push(else_function);
+                content.push_str(&format!("${{{}}}", condition));
+            }
+            TokenType::Else => {
+                // Ignore handled in if match
+            }
             _ => println!("Not implemented yet"),
         }
     }
@@ -44,6 +53,23 @@ pub fn generate_js(fn_name: &str, param: &str, nodes: &Vec<Node>, functions: Vec
         js.push_str(format!("{}\n", &function).as_str());
     }
     return format!("function {}({}) {{ \n {} \n return content \n }}", fn_name, param, js);
+}
+
+fn if_replacement(i: usize, nodes: &Vec<Node>) -> (String, String, String) {
+    let node = nodes.get(i).unwrap();
+
+    let else_function_name = generate_fn_name();
+    let mut else_function = generate_js(&else_function_name, "", &Vec::new(), Vec::new());
+
+    if (i + 1) <= nodes.len() {
+        let next_node = nodes.get(i + 1).unwrap();
+        else_function = generate_js(&else_function_name, "", &next_node.content.as_ref().unwrap(), Vec::new());
+    }
+
+    let if_function_name = generate_fn_name();
+    let if_function = generate_js(&if_function_name, "", &node.content.as_ref().unwrap(), Vec::new());
+    let if_value = format!("{} ? {}() : {}()", node.token_value, if_function_name, else_function_name);
+    return (if_value, if_function, else_function);
 }
 
 fn script_replacement(node: &Node) -> String {
@@ -61,8 +87,12 @@ fn script_replacement(node: &Node) -> String {
 fn each_replacement(node: &Node) -> (String, String) {
     let each: Vec<&str> = node.token_value.split(" in ").collect();
 
-    let map_function_name = generate(6, "abcdefghijklmnopqrstuvwxyz");
+    let map_function_name = generate_fn_name();
     let map_function = generate_js(&map_function_name.to_string(), each[0], &node.content.as_ref().unwrap(), Vec::new());
     let map = format!("{}.map({} => {}({})).join('')", each[1], each[0], map_function_name, each[0]);
     return (map, map_function);
+}
+
+fn generate_fn_name() -> String {
+    return generate(6, "abcdefghijklmnopqrstuvwxyz");
 }
