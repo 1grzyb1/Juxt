@@ -6,7 +6,7 @@ fn test_simple() {
     let result = compile_and_execute(Juxt {
         name: "main".to_string(),
         template: "Hello World".to_string(),
-    }, Vec::new());
+    }, Vec::new()).unwrap();
     assert_eq!(result, "Hello World");
 }
 
@@ -21,7 +21,7 @@ port: ${getPort()}";
     let result = compile_and_execute(Juxt {
         name: "main".to_string(),
         template: template.to_string(),
-    }, Vec::new());
+    }, Vec::new()).unwrap();
     assert_eq!(result, "port: 80");
 }
 
@@ -33,7 +33,7 @@ fn test_each() {
     let result = compile_and_execute(Juxt {
         name: "main".to_string(),
         template: template.to_string(),
-    }, Vec::new());
+    }, Vec::new()).unwrap();
     assert_eq!(result, "      port: 0\n          port: 1\n          port: 2\n    ");
 }
 
@@ -50,7 +50,7 @@ fn test_function_each() {
     let result = compile_and_execute(Juxt {
         name: "main".to_string(),
         template: template.to_string(),
-    }, Vec::new());
+    }, Vec::new()).unwrap();
     assert_eq!(result, "          port: 1\n          port: 2\n          port: 3\n    ");
 }
 
@@ -66,7 +66,7 @@ fn test_import() {
     let result = compile_and_execute(Juxt {
         name: "main".to_string(),
         template: template.to_string(),
-    }, vec!(component));
+    }, vec!(component)).unwrap();
     assert_eq!(result, "    Hello world");
 }
 
@@ -78,7 +78,7 @@ fn test_if() {
     let result = compile_and_execute(Juxt {
         name: "main".to_string(),
         template: template.to_string(),
-    }, Vec::new());
+    }, Vec::new()).unwrap();
     assert_eq!(result, "asd");
 
     let template = "{#if 1 != 1}\
@@ -87,7 +87,7 @@ fn test_if() {
     let result = compile_and_execute(Juxt {
         name: "main".to_string(),
         template: template.to_string(),
-    }, Vec::new());
+    }, Vec::new()).unwrap();
     assert_eq!(result, "");
 }
 
@@ -102,7 +102,7 @@ fn test_if_else() {
     let result = compile_and_execute(Juxt {
         name: "main".to_string(),
         template: template.to_string(),
-    }, Vec::new());
+    }, Vec::new()).unwrap();
     assert_eq!(result, "asd");
 
     let template = "{#if 1 !== 1}\
@@ -114,6 +114,6 @@ fn test_if_else() {
     let result = compile_and_execute(Juxt {
         name: "main".to_string(),
         template: template.to_string(),
-    }, Vec::new());
+    }, Vec::new()).unwrap();
     assert_eq!(result, "dsa");
 }

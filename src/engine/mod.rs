@@ -1,3 +1,5 @@
+use std::error::Error;
+
 mod tokenizer;
 mod evaluator;
 mod tree_builder;
@@ -7,25 +9,25 @@ pub struct Juxt {
     pub template: String,
 }
 
-pub fn execute(js_code: &str) -> String {
+pub fn execute(js_code: &str) -> Result<String, Box<dyn Error>> {
     return evaluator::eval(js_code);
 }
 
-pub fn compile(main: Juxt, dependencie: Vec<Juxt>) -> String {
+pub fn compile(main: Juxt, dependencie: Vec<Juxt>) -> Result<String, Box<dyn Error>> {
     let tokens = tokenizer::tokenize(&main.template);
     let tree = tree_builder::build_tree(&tokens);
-    let compiled_dependencies = compile_dependencies(&dependencie);
+    let compiled_dependencies = compile_dependencies(&dependencie)?;
     let compiled_main = evaluator::generate_js("execute", "context", &tree, compiled_dependencies);
     return compiled_main;
 }
 
-fn compile_dependencies(juxts: &Vec<Juxt>) -> Vec<String> {
+fn compile_dependencies(juxts: &Vec<Juxt>) -> Result<Vec<String>, Box<dyn Error>> {
     let mut compiled = Vec::new();
     for juxt in juxts {
         let tokens = tokenizer::tokenize(&juxt.template);
         let tree = tree_builder::build_tree(&tokens);
-        let compiled_juxt = evaluator::generate_js(&juxt.name, "context", &tree, Vec::new());
+        let compiled_juxt = evaluator::generate_js(&juxt.name, "context", &tree, Vec::new())?;
         compiled.push(compiled_juxt);
     }
-    return compiled;
+    return Ok(compiled);
 }
