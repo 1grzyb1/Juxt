@@ -15,7 +15,6 @@ fn build_one_element_tree() {
     assert_eq!(nodes[0].content, None);
 }
 
-
 #[test]
 #[should_panic]
 fn panic_when_only_closing_tag() {
@@ -30,38 +29,44 @@ fn panic_when_only_closing_tag() {
 #[test]
 #[should_panic]
 fn panic_when_open_tag_and_two_closing() {
-    let tokens = vec![Token {
-        value: String::from(""),
-        token_type: TokenType::Each,
-        tag_status: TagStatus::Open,
-    }, Token {
-        value: String::from(""),
-        token_type: TokenType::Each,
-        tag_status: TagStatus::Close,
-    },Token {
-        value: String::from(""),
-        token_type: TokenType::Each,
-        tag_status: TagStatus::Close,
-    }
+    let tokens = vec![
+        Token {
+            value: String::from(""),
+            token_type: TokenType::Each,
+            tag_status: TagStatus::Open,
+        },
+        Token {
+            value: String::from(""),
+            token_type: TokenType::Each,
+            tag_status: TagStatus::Close,
+        },
+        Token {
+            value: String::from(""),
+            token_type: TokenType::Each,
+            tag_status: TagStatus::Close,
+        },
     ];
     build_tree(&tokens);
 }
 
 #[test]
 fn build_nested_tree() {
-    let tokens = vec![Token {
-        value: String::from(""),
-        token_type: TokenType::Each,
-        tag_status: TagStatus::Open,
-    }, Token {
-        value: String::from("bla"),
-        token_type: TokenType::Content,
-        tag_status: TagStatus::Undefined,
-    },Token {
-        value: String::from(""),
-        token_type: TokenType::Each,
-        tag_status: TagStatus::Close,
-    }
+    let tokens = vec![
+        Token {
+            value: String::from(""),
+            token_type: TokenType::Each,
+            tag_status: TagStatus::Open,
+        },
+        Token {
+            value: String::from("bla"),
+            token_type: TokenType::Content,
+            tag_status: TagStatus::Undefined,
+        },
+        Token {
+            value: String::from(""),
+            token_type: TokenType::Each,
+            tag_status: TagStatus::Close,
+        },
     ];
     let nodes = build_tree(&tokens);
     assert_eq!(nodes.len(), 1);
@@ -76,23 +81,27 @@ fn build_nested_tree() {
 
 #[test]
 fn build_nested_tree_with_two_roots() {
-    let tokens = vec![Token {
-        value: String::from("bla"),
-        token_type: TokenType::Content,
-        tag_status: TagStatus::Undefined,
-    }, Token {
-        value: String::from(""),
-        token_type: TokenType::Each,
-        tag_status: TagStatus::Open,
-    }, Token {
-        value: String::from("bla"),
-        token_type: TokenType::Content,
-        tag_status: TagStatus::Undefined,
-    },Token {
-        value: String::from(""),
-        token_type: TokenType::Each,
-        tag_status: TagStatus::Close,
-    }
+    let tokens = vec![
+        Token {
+            value: String::from("bla"),
+            token_type: TokenType::Content,
+            tag_status: TagStatus::Undefined,
+        },
+        Token {
+            value: String::from(""),
+            token_type: TokenType::Each,
+            tag_status: TagStatus::Open,
+        },
+        Token {
+            value: String::from("bla"),
+            token_type: TokenType::Content,
+            tag_status: TagStatus::Undefined,
+        },
+        Token {
+            value: String::from(""),
+            token_type: TokenType::Each,
+            tag_status: TagStatus::Close,
+        },
     ];
     let nodes = build_tree(&tokens);
     assert_eq!(nodes.len(), 2);
@@ -110,31 +119,37 @@ fn build_nested_tree_with_two_roots() {
 
 #[test]
 fn build_double_nested_tree_with_two_roots() {
-    let tokens = vec![Token {
-        value: String::from("bla"),
-        token_type: TokenType::Content,
-        tag_status: TagStatus::Undefined,
-    }, Token {
-        value: String::from(""),
-        token_type: TokenType::Each,
-        tag_status: TagStatus::Open,
-    }, Token {
-        value: String::from(""),
-        token_type: TokenType::Each,
-        tag_status: TagStatus::Open,
-    }, Token {
-        value: String::from("bla"),
-        token_type: TokenType::Content,
-        tag_status: TagStatus::Undefined,
-    }, Token {
-        value: String::from(""),
-        token_type: TokenType::Each,
-        tag_status: TagStatus::Close,
-    }, Token {
-        value: String::from(""),
-        token_type: TokenType::Each,
-        tag_status: TagStatus::Close,
-    }
+    let tokens = vec![
+        Token {
+            value: String::from("bla"),
+            token_type: TokenType::Content,
+            tag_status: TagStatus::Undefined,
+        },
+        Token {
+            value: String::from(""),
+            token_type: TokenType::Each,
+            tag_status: TagStatus::Open,
+        },
+        Token {
+            value: String::from(""),
+            token_type: TokenType::Each,
+            tag_status: TagStatus::Open,
+        },
+        Token {
+            value: String::from("bla"),
+            token_type: TokenType::Content,
+            tag_status: TagStatus::Undefined,
+        },
+        Token {
+            value: String::from(""),
+            token_type: TokenType::Each,
+            tag_status: TagStatus::Close,
+        },
+        Token {
+            value: String::from(""),
+            token_type: TokenType::Each,
+            tag_status: TagStatus::Close,
+        },
     ];
     let nodes = build_tree(&tokens);
     assert_eq!(nodes.len(), 2);
@@ -155,27 +170,32 @@ fn build_double_nested_tree_with_two_roots() {
 
 #[test]
 fn build_double_nested_tree_without_close_tag_with_two_open() {
-    let tokens = vec![Token {
-        value: String::from("bla"),
-        token_type: TokenType::Content,
-        tag_status: TagStatus::Undefined,
-    }, Token {
-        value: String::from(""),
-        token_type: TokenType::Each,
-        tag_status: TagStatus::Open,
-    }, Token {
-        value: String::from(""),
-        token_type: TokenType::Content,
-        tag_status: TagStatus::Open,
-    },Token {
-        value: String::from(""),
-        token_type: TokenType::Content,
-        tag_status: TagStatus::Undefined,
-    }, Token {
-        value: String::from(""),
-        token_type: TokenType::Each,
-        tag_status: TagStatus::Close,
-    }
+    let tokens = vec![
+        Token {
+            value: String::from("bla"),
+            token_type: TokenType::Content,
+            tag_status: TagStatus::Undefined,
+        },
+        Token {
+            value: String::from(""),
+            token_type: TokenType::Each,
+            tag_status: TagStatus::Open,
+        },
+        Token {
+            value: String::from(""),
+            token_type: TokenType::Content,
+            tag_status: TagStatus::Open,
+        },
+        Token {
+            value: String::from(""),
+            token_type: TokenType::Content,
+            tag_status: TagStatus::Undefined,
+        },
+        Token {
+            value: String::from(""),
+            token_type: TokenType::Each,
+            tag_status: TagStatus::Close,
+        },
     ];
     let nodes = build_tree(&tokens);
     assert_eq!(nodes.len(), 2);
@@ -193,27 +213,32 @@ fn build_double_nested_tree_without_close_tag_with_two_open() {
 
 #[test]
 fn build_double_nested_tree_without_close_tag_with_two_roots() {
-    let tokens = vec![Token {
-        value: String::from("import"),
-        token_type: TokenType::Import,
-        tag_status: TagStatus::Open,
-    }, Token {
-        value: String::from(""),
-        token_type: TokenType::Each,
-        tag_status: TagStatus::Open,
-    }, Token {
-        value: String::from(""),
-        token_type: TokenType::Content,
-        tag_status: TagStatus::Open,
-    },Token {
-        value: String::from(""),
-        token_type: TokenType::Content,
-        tag_status: TagStatus::Open,
-    }, Token {
-        value: String::from(""),
-        token_type: TokenType::Each,
-        tag_status: TagStatus::Close,
-    }
+    let tokens = vec![
+        Token {
+            value: String::from("import"),
+            token_type: TokenType::Import,
+            tag_status: TagStatus::Open,
+        },
+        Token {
+            value: String::from(""),
+            token_type: TokenType::Each,
+            tag_status: TagStatus::Open,
+        },
+        Token {
+            value: String::from(""),
+            token_type: TokenType::Content,
+            tag_status: TagStatus::Open,
+        },
+        Token {
+            value: String::from(""),
+            token_type: TokenType::Content,
+            tag_status: TagStatus::Open,
+        },
+        Token {
+            value: String::from(""),
+            token_type: TokenType::Each,
+            tag_status: TagStatus::Close,
+        },
     ];
     let nodes = build_tree(&tokens);
     assert_eq!(nodes.len(), 2);

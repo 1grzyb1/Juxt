@@ -1,8 +1,6 @@
-
 use crate::engine::tokenizer::{TagStatus, Token, TokenType};
 
-#[derive(PartialEq)]
-#[derive(Debug)]
+#[derive(PartialEq, Debug)]
 pub struct Node {
     pub token_type: TokenType,
     pub token_value: String,
@@ -17,12 +15,14 @@ pub fn build_tree(tokens: &Vec<Token>) -> Vec<Node> {
         let (new_i, node) = match token.tag_status {
             TagStatus::Open => tree(i, tokens, 1.0),
             TagStatus::Close => panic!("Unexpected close tag: {:?}", token),
-            _ => (i + 1, Node {
-                token_type:
-                tokens.get(i).unwrap().clone().token_type,
-                token_value: tokens.get(i).unwrap().clone().value,
-                content: None,
-            }),
+            _ => (
+                i + 1,
+                Node {
+                    token_type: tokens.get(i).unwrap().clone().token_type,
+                    token_value: tokens.get(i).unwrap().clone().value,
+                    content: None,
+                },
+            ),
         };
         i = new_i;
         nodes.push(node);
@@ -39,14 +39,18 @@ fn tree(current_index: usize, tokens: &Vec<Token>, open_tags: f32) -> (usize, No
         let mut curr_open_tags = open_tags;
         let token = tokens.get(i).unwrap().clone();
 
-        if token.tag_status == TagStatus::Close &&
-            token.token_type == tokens.get(current_index).unwrap().clone().token_type {
+        if token.tag_status == TagStatus::Close
+            && token.token_type == tokens.get(current_index).unwrap().clone().token_type
+        {
             i += 1;
-            return (i, Node {
-                token_type: tokens.get(current_index).unwrap().clone().token_type,
-                token_value: tokens.get(current_index).unwrap().clone().value,
-                content: Some(content_nodes),
-            });
+            return (
+                i,
+                Node {
+                    token_type: tokens.get(current_index).unwrap().clone().token_type,
+                    token_value: tokens.get(current_index).unwrap().clone().value,
+                    content: Some(content_nodes),
+                },
+            );
         }
 
         if token.tag_status == TagStatus::Open {
@@ -72,9 +76,12 @@ fn tree(current_index: usize, tokens: &Vec<Token>, open_tags: f32) -> (usize, No
         i += 1;
     }
 
-    return (current_index + 1, Node {
-        token_type: tokens.get(current_index).unwrap().clone().token_type,
-        token_value: tokens.get(current_index).unwrap().clone().value,
-        content: Some(content_nodes),
-    });
+    return (
+        current_index + 1,
+        Node {
+            token_type: tokens.get(current_index).unwrap().clone().token_type,
+            token_value: tokens.get(current_index).unwrap().clone().value,
+            content: Some(content_nodes),
+        },
+    );
 }

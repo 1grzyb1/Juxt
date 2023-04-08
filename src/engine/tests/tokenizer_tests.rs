@@ -1,4 +1,4 @@
-use crate::engine::tokenizer::{TagStatus, tokenize, TokenType};
+use crate::engine::tokenizer::{tokenize, TagStatus, TokenType};
 
 #[test]
 fn should_tokenize_content() {
@@ -80,10 +80,10 @@ fn should_tokenize_if() {
     assert_eq!(tokens[2].tag_status, TagStatus::Close);
 }
 
-
 #[test]
 fn big_boy_test() {
-    let tokens = tokenize("{#import component.flux}
+    let tokens = tokenize(
+        "{#import component.flux}
 
 {#script}
     console.log(context.value);
@@ -103,7 +103,9 @@ spec:
       port: {$port}
       targetPort: {$getPort()}
     {/each}
-   {$component(10)}").unwrap();
+   {$component(10)}",
+    )
+    .unwrap();
 
     assert_eq!(tokens.len(), 10);
     assert_eq!(tokens[0].value, "component.flux");
