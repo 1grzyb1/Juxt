@@ -15,7 +15,7 @@ pub fn execute_js(js_code: &str, context: String) -> Result<String, Box<dyn std:
     return execute(js_code, context);
 }
 
-pub fn execute_flux(
+pub fn compile_flux(
     main: Juxt,
     dependencies: Vec<Juxt>,
 ) -> Result<String, Box<dyn std::error::Error>> {

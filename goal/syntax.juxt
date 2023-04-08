@@ -1,21 +1,8 @@
-{#import component.flux}
-
 {#script}
-    console.log(context.value);
-    function getPort() {
-        return 80;
+    function addOne(n) {
+        return n + 1;
     }
 {/script}
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: my-service
-spec:
-  ports:
-    {#each port in [0, 1, 2]}
-    - protocol: TCP
-      port: ${port}
-      targetPort: {#fn getPort()}
-    {/each}
-   {#fn component(10)}
+{#each n in [0, 1, 2]}
+{addOne(n)}
+{/each}
