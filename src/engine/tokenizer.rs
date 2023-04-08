@@ -1,6 +1,3 @@
-#[cfg(test)]
-mod tokenizer_tests;
-
 #[derive(PartialEq)]
 #[derive(Debug)]
 #[derive(Clone)]

@@ -1,9 +1,6 @@
 
 use crate::engine::tokenizer::{TagStatus, Token, TokenType};
 
-#[cfg(test)]
-mod tree_builder_tests;
-
 #[derive(PartialEq)]
 #[derive(Debug)]
 pub struct Node {

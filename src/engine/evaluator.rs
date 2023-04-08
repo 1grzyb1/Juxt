@@ -4,9 +4,6 @@ use crate::engine::tree_builder::Node;
 use random_string::generate;
 use std::error::Error;
 
-#[cfg(test)]
-mod evaluator_tests;
-
 pub fn eval(js_code: &str) -> Result<String, Box<dyn Error>> {
     println!("{}", js_code);
     let mut script = Script::from_string(&js_code)?;

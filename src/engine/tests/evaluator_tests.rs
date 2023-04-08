@@ -1,4 +1,6 @@
-use super::*;
+use crate::engine::evaluator::{eval, generate_js};
+use crate::engine::tokenizer::TokenType;
+use crate::engine::tree_builder::Node;
 
 #[test]
 fn parse_content() {
@@ -7,7 +9,7 @@ fn parse_content() {
         token_value: "Hello World".to_string(),
         content: None,
     }];
-    let result = eval(&generate_js("execute", "context", &nodes, Vec::new()));
+    let result = eval(&generate_js("execute", "context", &nodes, Vec::new()).unwrap()).unwrap();
     assert_eq!(result, "Hello World");
 }
 
@@ -26,7 +28,7 @@ fn parse_content_and_function() {
         token_value: "Hello World=${test()}".to_string(),
         content: None,
     }];
-    let result = eval(&generate_js("execute", "context", &nodes, Vec::new()));
+    let result = eval(&generate_js("execute", "context", &nodes, Vec::new()).unwrap()).unwrap();
     assert_eq!(result, "Hello World=test");
 }
 
@@ -41,7 +43,7 @@ fn parse_each() {
             content: None,
         }]),
     }];
-    let result = eval(&generate_js("execute", "context", &nodes, Vec::new()));
+    let result = eval(&generate_js("execute", "context", &nodes, Vec::new()).unwrap()).unwrap();
     assert_eq!(result, "testtesttest");
 }
 
@@ -64,6 +66,6 @@ fn parse_each_with_function() {
             content: None,
         }]),
     }];
-    let result = eval(&generate_js("execute", "context", &nodes, Vec::new()));
+    let result = eval(&generate_js("execute", "context", &nodes, Vec::new()).unwrap()).unwrap();
     assert_eq!(result, "test1test2test3");
 }

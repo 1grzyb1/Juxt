@@ -4,6 +4,13 @@ mod tokenizer;
 mod evaluator;
 mod tree_builder;
 
+#[cfg(test)]
+mod tests {
+    mod evaluator_tests;
+    mod tokenizer_tests;
+    mod tree_builder_tests;
+}
+
 pub struct Juxt {
     pub name: String,
     pub template: String,

@@ -1,4 +1,4 @@
-use super::*;
+use crate::engine::tokenizer::{TagStatus, tokenize, TokenType};
 
 #[test]
 fn should_tokenize_content() {
