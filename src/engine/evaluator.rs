@@ -4,12 +4,17 @@ use js_sandbox::Script;
 use random_string::generate;
 use std::error::Error;
 
-pub fn eval(js_code: &str) -> Result<String, Box<dyn Error>> {
-    println!("{}", js_code);
+pub fn eval(js_code: &str, context: String) -> Result<String, Box<dyn Error>> {
+    println!("context: {} \n {}", context, js_code);
     let mut script = Script::from_string(&js_code)?;
 
-    let arg = 7;
-    let result = script.call("execute", &arg)?;
+    let mut args = String::from("{}");
+
+    if !context.is_empty() {
+        args = context;
+    }
+
+    let result = script.call("execute", &args)?;
 
     Ok(result)
 }
@@ -50,7 +55,21 @@ pub fn generate_js(
         }
     }
 
-    let mut js = format!("{} \n let content = `{}`\n", scripts, content);
+    let mut js = String::new();
+
+    if !param.is_empty() {
+        js.push_str(&format!(
+            "try {{ {} = JSON.parse({}) }} catch (error) {{}}\n",
+            param, param
+        ));
+    }
+
+    js.push_str(&format!(
+        "
+       {} \n let content = `{}`\n",
+        scripts, content
+    ));
+
     for function in functions {
         js.push_str(format!("{}\n", &function).as_str());
     }

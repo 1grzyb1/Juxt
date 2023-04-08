@@ -16,8 +16,8 @@ pub struct Juxt {
     pub template: String,
 }
 
-pub fn execute(js_code: &str) -> Result<String, Box<dyn Error>> {
-    return evaluator::eval(js_code);
+pub fn execute(js_code: &str, context: String) -> Result<String, Box<dyn Error>> {
+    return evaluator::eval(js_code, context);
 }
 
 pub fn compile(main: Juxt, dependencie: Vec<Juxt>) -> Result<String, Box<dyn Error>> {

@@ -9,7 +9,11 @@ fn parse_content() {
         token_value: "Hello World".to_string(),
         content: None,
     }];
-    let result = eval(&generate_js("execute", "context", &nodes, Vec::new()).unwrap()).unwrap();
+    let result = eval(
+        &generate_js("execute", "context", &nodes, Vec::new()).unwrap(),
+        String::new(),
+    )
+    .unwrap();
     assert_eq!(result, "Hello World");
 }
 
@@ -31,7 +35,11 @@ fn parse_content_and_function() {
             content: None,
         },
     ];
-    let result = eval(&generate_js("execute", "context", &nodes, Vec::new()).unwrap()).unwrap();
+    let result = eval(
+        &generate_js("execute", "context", &nodes, Vec::new()).unwrap(),
+        String::new(),
+    )
+    .unwrap();
     assert_eq!(result, "Hello World=test");
 }
 
@@ -46,7 +54,11 @@ fn parse_each() {
             content: None,
         }]),
     }];
-    let result = eval(&generate_js("execute", "context", &nodes, Vec::new()).unwrap()).unwrap();
+    let result = eval(
+        &generate_js("execute", "context", &nodes, Vec::new()).unwrap(),
+        String::new(),
+    )
+    .unwrap();
     assert_eq!(result, "testtesttest");
 }
 
@@ -72,6 +84,10 @@ fn parse_each_with_function() {
             }]),
         },
     ];
-    let result = eval(&generate_js("execute", "context", &nodes, Vec::new()).unwrap()).unwrap();
+    let result = eval(
+        &generate_js("execute", "context", &nodes, Vec::new()).unwrap(),
+        String::new(),
+    )
+    .unwrap();
     assert_eq!(result, "test1test2test3");
 }
