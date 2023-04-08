@@ -42,14 +42,11 @@ pub fn tokenize(val: &str) -> Vec<Token> {
 
 fn clear_whitespace(tokens: Vec<Token>) -> Vec<Token> {
     let mut cleared: Vec<Token> = Vec::new();
-    for (i, token) in tokens.iter().enumerate() {
 
-        if i > 0 && token.token_type == TokenType::Content &&
-            tokens.get(i - 1).unwrap().token_type != TokenType::Content {
+    for (i, token) in tokens.iter().enumerate() {
+        if should_remove_leading_newline(i, token, &tokens) {
             let mut value = token.value.clone();
-            if token.value.starts_with('\n') {
-                value = value[1..].parse().unwrap();
-            }
+            value = remove_leading_newline(&value);
             cleared.push(Token {
                 value,
                 token_type: token.token_type.clone(),
@@ -58,40 +55,42 @@ fn clear_whitespace(tokens: Vec<Token>) -> Vec<Token> {
             continue;
         }
 
-        if i >= tokens.len() - 1 {
+        if i >= tokens.len() - 1 || should_not_remove_trailing_whitespace(i, token, &tokens) {
             cleared.push(token.clone());
             continue;
         }
 
-        if  token.token_type != TokenType::Content &&
-            tokens.get(i + 1).unwrap().token_type != TokenType::Content {
-            cleared.push(token.clone());
-            continue;
-        }
+        let value = remove_trailing_whitespace(&token.value);
 
-        let mut value = token.value.clone();
-        let mut last_pop = String::from("");
-
-        while value.ends_with(" ") || value.ends_with("\t") || value.ends_with("\r") || value.ends_with("\n") {
-            let pop = value.pop();
-            if pop.is_none() || pop.unwrap() == '\n' {
-                last_pop = String::from(pop.unwrap());
-                break;
-            }
-        }
-
-        if last_pop == "\n" {
-            cleared.push(Token {
-                value: value,
-                token_type: token.token_type.clone(),
-                tag_status: token.tag_status.clone(),
-            });
-            continue;
-        }
-
-        cleared.push(token.clone());
+        cleared.push(Token {
+            value,
+            token_type: token.token_type.clone(),
+            tag_status: token.tag_status.clone(),
+        });
     }
-    return cleared;
+
+    cleared
+}
+
+fn should_remove_leading_newline(i: usize, token: &Token, tokens: &[Token]) -> bool {
+    i > 0 && token.token_type == TokenType::Content && tokens[i - 1].token_type != TokenType::Content
+}
+
+fn should_not_remove_trailing_whitespace(i: usize, token: &Token, tokens: &[Token]) -> bool {
+    token.token_type != TokenType::Content && tokens[i + 1].token_type != TokenType::Content
+}
+
+fn remove_leading_newline(value: &str) -> String {
+    if value.starts_with('\n') {
+        value[1..].to_string()
+    } else {
+        value.to_string()
+    }
+}
+
+fn remove_trailing_whitespace(value: &str) -> String {
+    let trimmed = value.trim_end_matches(|c| c == ' ' || c == '\t' || c == '\r' || c == '\n');
+    trimmed.to_string()
 }
 
 fn concat_content(tokens: &Vec<Token>) -> Vec<Token> {
