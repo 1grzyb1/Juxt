@@ -45,5 +45,8 @@ will be evaluated to:
 3
 ```
 
+## Syntax
+Here's a summary of the [Syntax](syntax.md)
+
 ## Contributing
 If you'd like to contribute to the Juxt project, please submit a pull request or open an issue on the project's GitHub repository. We welcome any feedback and contributions!
