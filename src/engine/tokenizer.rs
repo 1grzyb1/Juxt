@@ -1,6 +1,6 @@
-#[derive(PartialEq)]
-#[derive(Debug)]
-#[derive(Clone)]
+use std::error::Error;
+
+#[derive(PartialEq, Debug, Clone)]
 pub enum TokenType {
     Import,
     Script,
@@ -10,34 +10,31 @@ pub enum TokenType {
     Else,
 }
 
-#[derive(PartialEq)]
-#[derive(Debug)]
-#[derive(Clone)]
+#[derive(PartialEq, Debug, Clone)]
 pub enum TagStatus {
     Open,
     Close,
     Undefined,
 }
 
-#[derive(Clone)]
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Token {
     pub value: String,
     pub token_type: TokenType,
     pub tag_status: TagStatus,
 }
 
-pub fn tokenize(val: &str) -> Vec<Token> {
+pub fn tokenize(val: &str) -> Result<Vec<Token>, Box<dyn Error>> {
     let mut tokens: Vec<Token> = Vec::new();
     let mut pointer = 0;
     while pointer < val.len() {
-        let (new_pointer, token) = next_token(pointer, val);
+        let (new_pointer, token) = next_token(pointer, val)?;
         tokens.push(token);
         pointer = new_pointer;
     }
 
     let concat = concat_content(&tokens);
-    return clear_whitespace(concat);
+    return Ok(clear_whitespace(concat));
 }
 
 fn clear_whitespace(tokens: Vec<Token>) -> Vec<Token> {
@@ -73,7 +70,9 @@ fn clear_whitespace(tokens: Vec<Token>) -> Vec<Token> {
 }
 
 fn should_remove_leading_newline(i: usize, token: &Token, tokens: &[Token]) -> bool {
-    i > 0 && token.token_type == TokenType::Content && tokens[i - 1].token_type != TokenType::Content
+    i > 0
+        && token.token_type == TokenType::Content
+        && tokens[i - 1].token_type != TokenType::Content
 }
 
 fn should_not_remove_trailing_whitespace(i: usize, token: &Token, tokens: &[Token]) -> bool {
@@ -121,55 +120,64 @@ fn concat_content(tokens: &Vec<Token>) -> Vec<Token> {
     return concatinated;
 }
 
-fn next_token(pointer: usize, val: &str) -> (usize, Token) {
+fn next_token(pointer: usize, val: &str) -> Result<(usize, Token), Box<dyn Error>> {
     let mut pointer = pointer;
-    if get_char_at(pointer, val) == '{' {
-        let (new_pointer, token) = match_token(pointer, val);
+    if get_char_at(pointer, val)? == '{' {
+        let (new_pointer, token) = match_token(pointer, val)?;
         if !matches!(token.token_type, TokenType::Content) {
-            return (new_pointer, token);
+            return Ok((new_pointer, token));
         }
     }
 
-    let mut content = String::from(get_char_at(pointer, val));
+    let mut content = String::from(get_char_at(pointer, val)?);
     pointer = pointer + 1;
-    while pointer < val.len() && get_char_at(pointer, val) != '{' {
-        content = vec![content, String::from(get_char_at(pointer, val))].join("");
+    while pointer < val.len() && get_char_at(pointer, val)? != '{' {
+        content = vec![content, String::from(get_char_at(pointer, val)?)].join("");
         pointer = pointer + 1;
     }
-    return (pointer, Token {
-        value: content,
-        token_type: TokenType::Content,
-        tag_status: TagStatus::Undefined,
-    });
-}
-
-fn match_token(pointer: usize, val: &str) -> (usize, Token) {
-    let mut pointer = pointer + 1;
-    if get_char_at(pointer, val) != '#' && get_char_at(pointer, val) != '/' {
-        return (pointer, Token {
-            value: String::from("{"),
+    return Ok((
+        pointer,
+        Token {
+            value: content,
             token_type: TokenType::Content,
             tag_status: TagStatus::Undefined,
-        });
+        },
+    ));
+}
+
+fn match_token(pointer: usize, val: &str) -> Result<(usize, Token), Box<dyn Error>> {
+    let mut pointer = pointer + 1;
+    if get_char_at(pointer, val)? != '#' && get_char_at(pointer, val)? != '/' {
+        return Ok((
+            pointer,
+            Token {
+                value: String::from("{"),
+                token_type: TokenType::Content,
+                tag_status: TagStatus::Undefined,
+            },
+        ));
     }
-    let tag_status = match get_char_at(pointer, val) {
+    let tag_status = match get_char_at(pointer, val)? {
         '#' => TagStatus::Open,
         '/' => TagStatus::Close,
         _ => TagStatus::Undefined,
     };
 
     pointer = pointer + 1;
-    pointer = skip_whitespace(pointer, val);
-    let (new_pointer, type_token) = read_token_type(pointer, val);
+    pointer = skip_whitespace(pointer, val)?;
+    let (new_pointer, type_token) = read_token_type(pointer, val)?;
     pointer = new_pointer;
-    pointer = skip_whitespace(pointer, val);
-    let (pointer, content) = read_content(pointer, val);
+    pointer = skip_whitespace(pointer, val)?;
+    let (pointer, content) = read_content(pointer, val)?;
 
-    return (pointer + 1, Token {
-        value: String::from(content),
-        token_type: match_type(type_token),
-        tag_status,
-    });
+    return Ok((
+        pointer + 1,
+        Token {
+            value: String::from(content),
+            token_type: match_type(type_token),
+            tag_status,
+        },
+    ));
 }
 
 fn match_type(type_token: &str) -> TokenType {
@@ -183,32 +191,32 @@ fn match_type(type_token: &str) -> TokenType {
     }
 }
 
-fn read_content(beginning: usize, val: &str) -> (usize, &str) {
+fn read_content(beginning: usize, val: &str) -> Result<(usize, &str), Box<dyn Error>> {
     let mut pointer = beginning;
-    while get_char_at(pointer, val) != '}' {
+    while get_char_at(pointer, val)? != '}' {
         pointer = pointer + 1;
     }
-    return (pointer, &val[beginning..pointer]);
+    return Ok((pointer, &val[beginning..pointer]));
 }
 
-fn read_token_type(beginning: usize, val: &str) -> (usize, &str) {
+fn read_token_type(beginning: usize, val: &str) -> Result<(usize, &str), Box<dyn Error>> {
     let mut pointer = beginning;
-    while get_char_at(pointer, val) != ' ' && get_char_at(pointer, val) != '}' {
+    while get_char_at(pointer, val)? != ' ' && get_char_at(pointer, val)? != '}' {
         pointer = pointer + 1;
     }
-    return (pointer, &val[beginning..pointer]);
+    return Ok((pointer, &val[beginning..pointer]));
 }
 
-fn skip_whitespace(pointer: usize, val: &str) -> usize {
+fn skip_whitespace(pointer: usize, val: &str) -> Result<usize, Box<dyn Error>> {
     let mut pointer = pointer;
-    while get_char_at(pointer, val) == ' ' {
+    while get_char_at(pointer, val)? == ' ' {
         pointer = pointer + 1;
     }
-    return pointer;
+    return Ok(pointer);
 }
 
-
-fn get_char_at(pointer: usize, val: &str) -> char {
-    return val.chars().nth(pointer).unwrap();
+fn get_char_at(pointer: usize, val: &str) -> Result<char, Box<dyn Error>> {
+    val.chars()
+        .nth(pointer)
+        .ok_or(format!("There is no char at given index {}, {}", pointer, val).into())
 }
-

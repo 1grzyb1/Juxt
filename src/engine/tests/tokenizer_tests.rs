@@ -2,7 +2,7 @@ use crate::engine::tokenizer::{TagStatus, tokenize, TokenType};
 
 #[test]
 fn should_tokenize_content() {
-    let tokens = tokenize("some test");
+    let tokens = tokenize("some test").unwrap();
     assert_eq!(tokens.len(), 1);
     assert_eq!(tokens[0].value, "some test");
     assert_eq!(tokens[0].token_type, TokenType::Content);
@@ -11,7 +11,7 @@ fn should_tokenize_content() {
 
 #[test]
 fn should_tokenize_import() {
-    let tokens = tokenize("{#import component.flux}");
+    let tokens = tokenize("{#import component.flux}").unwrap();
     assert_eq!(tokens.len(), 1);
     assert_eq!(tokens[0].value, "component.flux");
     assert_eq!(tokens[0].token_type, TokenType::Import);
@@ -20,7 +20,7 @@ fn should_tokenize_import() {
 
 #[test]
 fn should_tokenize_import_and_content() {
-    let tokens = tokenize("{#import component.flux} blbablb");
+    let tokens = tokenize("{#import component.flux} blbablb").unwrap();
     assert_eq!(tokens.len(), 2);
     assert_eq!(tokens[0].value, "component.flux");
     assert_eq!(tokens[0].token_type, TokenType::Import);
@@ -33,13 +33,13 @@ fn should_tokenize_import_and_content() {
 
 #[test]
 fn should_tokenize_script_and_content() {
-    let tokens = tokenize("{#script}");
+    let tokens = tokenize("{#script}").unwrap();
     assert_eq!(tokens.len(), 1);
     assert_eq!(tokens[0].value, "");
     assert_eq!(tokens[0].token_type, TokenType::Script);
     assert_eq!(tokens[0].tag_status, TagStatus::Open);
 
-    let tokens = tokenize("{# script  }");
+    let tokens = tokenize("{# script  }").unwrap();
     assert_eq!(tokens.len(), 1);
     assert_eq!(tokens[0].value, "");
     assert_eq!(tokens[0].token_type, TokenType::Script);
@@ -48,7 +48,7 @@ fn should_tokenize_script_and_content() {
 
 #[test]
 fn should_tokenize_open_cloased_and_content() {
-    let tokens = tokenize("{#script} bigos bigos {/script}");
+    let tokens = tokenize("{#script} bigos bigos {/script}").unwrap();
     assert_eq!(tokens.len(), 3);
     assert_eq!(tokens[0].value, "");
     assert_eq!(tokens[0].token_type, TokenType::Script);
@@ -65,7 +65,7 @@ fn should_tokenize_open_cloased_and_content() {
 
 #[test]
 fn should_tokenize_if() {
-    let tokens = tokenize("{#if 1 == 1} bigos bigos {/if}");
+    let tokens = tokenize("{#if 1 == 1} bigos bigos {/if}").unwrap();
     assert_eq!(tokens.len(), 3);
     assert_eq!(tokens[0].value, "1 == 1");
     assert_eq!(tokens[0].token_type, TokenType::If);
@@ -103,7 +103,7 @@ spec:
       port: {$port}
       targetPort: {$getPort()}
     {/each}
-   {$component(10)}");
+   {$component(10)}").unwrap();
 
     assert_eq!(tokens.len(), 10);
     assert_eq!(tokens[0].value, "component.flux");
