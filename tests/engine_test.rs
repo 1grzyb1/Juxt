@@ -57,7 +57,7 @@ fn test_function_each() {
 #[test]
 fn test_import() {
     let component = Juxt {
-        name: "component".to_string(),
+        name: "component.juxt".to_string(),
         template: "Hello world".to_string(),
     };
 
@@ -68,6 +68,24 @@ fn test_import() {
         template: template.to_string(),
     }, vec!(component)).unwrap();
     assert_eq!(result, "    Hello world");
+}
+
+#[test]
+fn test_import_script() {
+    let component = Juxt {
+        name: "script.js".to_string(),
+        template: "function getPort() {
+        return 80;
+    }".to_string(),
+    };
+
+    let template = "{#import script.js}
+    ${getPort()}";
+    let result = compile_and_execute(Juxt {
+        name: "main".to_string(),
+        template: template.to_string(),
+    }, vec!(component)).unwrap();
+    assert_eq!(result, "    80");
 }
 
 #[test]

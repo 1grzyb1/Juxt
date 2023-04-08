@@ -33,8 +33,21 @@ fn compile_dependencies(juxts: &Vec<Juxt>) -> Result<Vec<String>, Box<dyn Error>
     for juxt in juxts {
         let tokens = tokenizer::tokenize(&juxt.template)?;
         let tree = tree_builder::build_tree(&tokens);
-        let compiled_juxt = evaluator::generate_js(&juxt.name, "context", &tree, Vec::new())?;
+        let (extension, name) = split_name(&juxt.name)?;
+        let compiled_juxt= match extension {
+            "js" => Ok(juxt.template.clone()),
+            "juxt" => evaluator::generate_js(name, "context", &tree, Vec::new()),
+            _ => Err("Script tag can only contain content".into())
+        }?;
+
         compiled.push(compiled_juxt);
     }
     return Ok(compiled);
+}
+
+fn split_name(juxt_name: &String) -> Result<(&str, &str), Box<dyn Error>> {
+    let split: Vec<&str> = juxt_name.split(".").map(|s| s).collect();
+    let extension = split.last().ok_or("No extension found")?;
+    let name = split.get(0).ok_or("No name found")?;
+    Ok((*extension, *name))
 }
