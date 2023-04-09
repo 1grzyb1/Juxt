@@ -10,7 +10,20 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
+  build-juxt-core:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build
+      working-directory: ./juxt-core
+      run: cargo build --verbose
+    - name: Run tests
+      working-directory: ./juxt-core
+      run: cargo test --verbose
+
+  build-juxt:
 
     runs-on: ubuntu-latest
 
