@@ -129,7 +129,7 @@ fn test_import_script() {
 fn test_if() {
     let template = "{#if 1 == 1}\
     asd\
-    {/if}";
+    {/if}1";
     let result = compile_and_execute(
         Juxt {
             name: "main".to_string(),
@@ -139,11 +139,11 @@ fn test_if() {
         String::new(),
     )
     .unwrap();
-    assert_eq!(result, "asd");
+    assert_eq!(result, "asd1");
 
     let template = "{#if 1 != 1}\
     asd\
-    {/if}";
+    {/if}1";
     let result = compile_and_execute(
         Juxt {
             name: "main".to_string(),
@@ -153,7 +153,7 @@ fn test_if() {
         String::new(),
     )
     .unwrap();
-    assert_eq!(result, "");
+    assert_eq!(result, "1");
 }
 
 #[test]
