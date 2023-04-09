@@ -37,44 +37,16 @@ pub fn generate_js(
 
     for (i, node) in nodes.iter().enumerate() {
         match node.token_type {
-            TokenType::Import => {
-                let import_name = node.token_value.clone();
-                let import = imports.iter().find(|i| i.name == import_name);
-                match import {
-                    Some(import) => {
-                        functions.push(import.content.clone());
-                    }
-                    None => {
-                        return Err(format!("Import {} not found", import_name).into());
-                    }
-                }
-            }
-            TokenType::Script => {
-                scripts.push_str(&script_replacement(node)?);
-            }
-            TokenType::Content => {
-                content.push_str(&node.token_value);
-            }
-            TokenType::Each => {
-                let (map, map_function) = each_replacement(node)?;
-                functions.push(map_function);
-                content.push_str(&format!("${{{}}}", map));
-            }
-            TokenType::If => {
-                let (condition, condition_function, else_function) = if_replacement(i, nodes)?;
-                functions.push(condition_function);
-                functions.push(else_function);
-                content.push_str(&format!("${{{}}}", condition));
-            }
-            TokenType::Else => {
-                // Ignore handled in if match
-            }
-            _ => println!("Not implemented yet"),
+            TokenType::Import => handle_import(&mut functions, &imports, node)?,
+            TokenType::Script => scripts.push_str(&script_replacement(node)?),
+            TokenType::Content => content.push_str(&node.token_value),
+            TokenType::Each => handle_each(&mut functions, &mut content, node)?,
+            TokenType::If => handle_if(&mut functions, &mut content, i, nodes)?,
+            TokenType::Else => { /* Ignore, handled in if match */ }
         }
     }
 
     let mut js = String::new();
-
     if !param.is_empty() {
         js.push_str(&format!(
             "try {{ {} = JSON.parse({}) }} catch (error) {{}}\n",
@@ -89,14 +61,54 @@ pub fn generate_js(
     ));
 
     for function in functions {
-        js.push_str(format!("{}\n", &function).as_str());
+        js.push_str(&format!("{}\n", &function));
     }
+
     Ok(format!(
         "function {}({}) {{ \n {} \n return content \n }}",
         fn_name, param, js
     ))
 }
 
+fn handle_import(
+    functions: &mut Vec<String>,
+    imports: &[Import],
+    node: &Node,
+) -> Result<(), Box<dyn Error>> {
+    let import_name = node.token_value.clone();
+    let import = imports.iter().find(|i| i.name == import_name);
+    match import {
+        Some(import) => {
+            functions.push(import.content.clone());
+            Ok(())
+        }
+        None => Err(format!("Import {} not found", import_name).into()),
+    }
+}
+
+fn handle_each(
+    functions: &mut Vec<String>,
+    content: &mut String,
+    node: &Node,
+) -> Result<(), Box<dyn Error>> {
+    let (map, map_function) = each_replacement(node)?;
+    functions.push(map_function);
+    content.push_str(&format!("${{{}}}", map));
+    Ok(())
+}
+
+fn handle_if(
+    functions: &mut Vec<String>,
+    content: &mut String,
+    index: usize,
+    nodes: &Vec<Node>,
+) -> Result<(), Box<dyn Error>> {
+    let (condition, condition_function, else_function) = if_replacement(index, nodes)?;
+    functions.push(condition_function);
+    functions.push(else_function);
+    content.push_str(&format!("${{{}}}", condition));
+    Ok(())
+}
 fn if_replacement(i: usize, nodes: &Vec<Node>) -> Result<(String, String, String), Box<dyn Error>> {
     let node = nodes.get(i).ok_or("Node not found")?;
 
