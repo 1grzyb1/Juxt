@@ -1,11 +1,12 @@
 use crate::engine::tokenizer::TokenType;
 use crate::engine::tree_builder::Node;
+use debug_print::{debug_println};
 use js_sandbox::Script;
 use random_string::generate;
 use std::error::Error;
 
 pub fn eval(js_code: &str, context: String) -> Result<String, Box<dyn Error>> {
-    println!("context: {} \n {}", context, js_code);
+    debug_println!("context: {} \n {}", context, js_code);
     let mut script = Script::from_string(&js_code)?;
 
     let mut args = String::from("{}");

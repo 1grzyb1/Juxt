@@ -1,9 +1,11 @@
 [package]
-name = "juxt"
+name = "juxt-core"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-juxt-core = { path = "juxt-core" }
+js-sandbox = "0.1.6"
+random-string = "1.0"
+debug_print = "1.0.0"

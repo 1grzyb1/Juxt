@@ -228,13 +228,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "juxt"
-version = "0.1.0"
-dependencies = [
- "juxt-core",
-]
-
-[[package]]
 name = "juxt-core"
 version = "0.1.0"
 dependencies = [

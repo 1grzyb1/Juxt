@@ -1,7 +1,7 @@
 use std::error::Error;
 
-mod tokenizer;
 mod evaluator;
+mod tokenizer;
 mod tree_builder;
 
 #[cfg(test)]
@@ -34,10 +34,10 @@ fn compile_dependencies(juxts: &Vec<Juxt>) -> Result<Vec<String>, Box<dyn Error>
         let tokens = tokenizer::tokenize(&juxt.template)?;
         let tree = tree_builder::build_tree(&tokens);
         let (extension, name) = split_name(&juxt.name)?;
-        let compiled_juxt= match extension {
+        let compiled_juxt = match extension {
             "js" => Ok(juxt.template.clone()),
             "juxt" => evaluator::generate_js(name, "context", &tree, Vec::new()),
-            _ => Err("Script tag can only contain content".into())
+            _ => Err("Script tag can only contain content".into()),
         }?;
 
         compiled.push(compiled_juxt);
