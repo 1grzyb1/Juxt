@@ -1,9 +1,14 @@
 use crate::engine::tokenizer::TokenType;
 use crate::engine::tree_builder::Node;
-use debug_print::{debug_println};
+use debug_print::debug_println;
 use js_sandbox::Script;
 use random_string::generate;
 use std::error::Error;
+
+pub struct Import {
+    pub name: String,
+    pub content: String,
+}
 
 pub fn eval(js_code: &str, context: String) -> Result<String, Box<dyn Error>> {
     debug_println!("context: {} \n {}", context, js_code);
@@ -24,14 +29,26 @@ pub fn generate_js(
     fn_name: &str,
     param: &str,
     nodes: &Vec<Node>,
-    functions: Vec<String>,
+    imports: Vec<Import>,
 ) -> Result<String, Box<dyn Error>> {
-    let mut functions = functions;
+    let mut functions = Vec::new();
     let mut content = String::new();
     let mut scripts = String::new();
 
     for (i, node) in nodes.iter().enumerate() {
         match node.token_type {
+            TokenType::Import => {
+                let import_name = node.token_value.clone();
+                let import = imports.iter().find(|i| i.name == import_name);
+                match import {
+                    Some(import) => {
+                        functions.push(import.content.clone());
+                    }
+                    None => {
+                        return Err(format!("Import {} not found", import_name).into());
+                    }
+                }
+            }
             TokenType::Script => {
                 scripts.push_str(&script_replacement(node)?);
             }

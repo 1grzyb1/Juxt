@@ -1,0 +1,6 @@
+{#import component.juxt}
+{#import script.js}
+{#each n in [0, 1, 2]}
+number: ${addOne(n)}
+${component(context.name)}
+{/each}

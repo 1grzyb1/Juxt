@@ -1,8 +1,0 @@
-{#script}
-    function addOne(n) {
-        return n + 1;
-    }
-{/script}
-{#each n in [0, 1, 2]}
-{addOne(n)}
-{/each}

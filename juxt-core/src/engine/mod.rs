@@ -1,5 +1,7 @@
 use std::error::Error;
 
+use crate::engine::evaluator::Import;
+
 mod evaluator;
 mod tokenizer;
 mod tree_builder;
@@ -28,17 +30,17 @@ pub fn compile(main: Juxt, dependencie: Vec<Juxt>) -> Result<String, Box<dyn Err
     return compiled_main;
 }
 
-fn compile_dependencies(juxts: &Vec<Juxt>) -> Result<Vec<String>, Box<dyn Error>> {
+fn compile_dependencies(juxts: &Vec<Juxt>) -> Result<Vec<Import>, Box<dyn Error>> {
     let mut compiled = Vec::new();
     for juxt in juxts {
         let tokens = tokenizer::tokenize(&juxt.template)?;
         let tree = tree_builder::build_tree(&tokens);
         let (extension, name) = split_name(&juxt.name)?;
         let compiled_juxt = match extension {
-            "js" => Ok(juxt.template.clone()),
-            "juxt" => evaluator::generate_js(name, "context", &tree, Vec::new()),
-            _ => Err("Script tag can only contain content".into()),
-        }?;
+            "js" => Import {name: juxt.name.to_string(), content: juxt.template.clone()},
+            "juxt" => Import {name: juxt.name.to_string(), content: evaluator::generate_js(name, "context", &tree, Vec::new())?},
+            _ => return Err(format!("Extension {} not supported", extension).into()),
+        };
 
         compiled.push(compiled_juxt);
     }
