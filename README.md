@@ -14,6 +14,23 @@ Add the Juxt library to your project as a dependency.
 
 ### Usage
 
+#### CLI
+
+To use the Juxt command-line tool, you can provide the following arguments:
+
+- `--path` (short: `-p`): The path from which the template will be read. By default, it is set to an empty string. Example: `--path /path/to/templates`
+- `--main` (short: `-m`): The main template name. By default, it is set to "main.juxt". Example: `--main my-main-template.juxt`
+- `--context` (short: `-c`): The context in JSON format to be passed to the template. By default, it is set to an empty JSON object (`{}`). Example: `--context '{"key": "value"}'`
+
+Here's an example command that demonstrates how to use these arguments:
+
+```bash
+juxt -- --path /path/to/templates --main my-main-template.juxt --context '{"key": "value"}'
+```
+
+This command reads the template from the specified path, uses the main template named `my-main-template.juxt`, and passes a context containing a single key-value pair.
+
+#### Library
 To evaluate template you need to call `compile_and_execute` providing 
 - `main` template which will be entrypoint
 - `dependencies` - all other templates that main template depends on
