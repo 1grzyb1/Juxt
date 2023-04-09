@@ -2,5 +2,7 @@
 {#import script.js}
 {#each n in [0, 1, 2]}
 number: ${addOne(n)}
+{#if (n % 2 == 1)}
 ${component(context.name)}
+{/if}
 {/each}

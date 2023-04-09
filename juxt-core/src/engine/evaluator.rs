@@ -117,12 +117,14 @@ fn if_replacement(i: usize, nodes: &Vec<Node>) -> Result<(String, String, String
 
     if (i + 1) < nodes.len() {
         let next_node = nodes.get(i + 1).ok_or("Next node not found")?;
-        else_function = generate_js(
-            &else_function_name,
-            "",
-            &next_node.content.as_ref().unwrap(),
-            Vec::new(),
-        )?;
+        if next_node.token_type == TokenType::Else {
+            else_function = generate_js(
+                &else_function_name,
+                "",
+                &next_node.content.as_ref().unwrap(),
+                Vec::new(),
+            )?;
+        }
     }
 
     let if_function_name = generate_fn_name();
