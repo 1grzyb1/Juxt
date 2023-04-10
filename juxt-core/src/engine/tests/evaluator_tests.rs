@@ -1,4 +1,4 @@
-use crate::engine::evaluator::{eval, generate_js};
+use crate::engine::evaluator::{eval, Compiler};
 use crate::engine::tokenizer::TokenType;
 use crate::engine::tree_builder::Node;
 
@@ -10,7 +10,7 @@ fn parse_content() {
         content: None,
     }];
     let result = eval(
-        &generate_js("execute", "context", &nodes, Vec::new()).unwrap(),
+        &Compiler{imports: Vec::new()}.generate_js("execute", "context", &nodes).unwrap(),
         String::new(),
     )
     .unwrap();
@@ -36,7 +36,7 @@ fn parse_content_and_function() {
         },
     ];
     let result = eval(
-        &generate_js("execute", "context", &nodes, Vec::new()).unwrap(),
+        &Compiler{imports: Vec::new()}.generate_js("execute", "context", &nodes).unwrap(),
         String::new(),
     )
     .unwrap();
@@ -55,7 +55,7 @@ fn parse_each() {
         }]),
     }];
     let result = eval(
-        &generate_js("execute", "context", &nodes, Vec::new()).unwrap(),
+        &Compiler{imports: Vec::new()}.generate_js("execute", "context", &nodes).unwrap(),
         String::new(),
     )
     .unwrap();
@@ -85,7 +85,7 @@ fn parse_each_with_function() {
         },
     ];
     let result = eval(
-        &generate_js("execute", "context", &nodes, Vec::new()).unwrap(),
+        &Compiler{imports: Vec::new()}.generate_js("execute", "context", &nodes).unwrap(),
         String::new(),
     )
     .unwrap();

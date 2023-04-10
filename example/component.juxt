@@ -1,1 +1,2 @@
+{#import script.js}
 component: ${context}

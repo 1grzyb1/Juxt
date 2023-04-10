@@ -1,6 +1,6 @@
 use std::error::Error;
 
-use crate::engine::evaluator::Import;
+use crate::engine::evaluator::{Compiler, Import};
 
 mod evaluator;
 mod tokenizer;
@@ -25,8 +25,11 @@ pub fn execute(js_code: &str, context: String) -> Result<String, Box<dyn Error>>
 pub fn compile(main: Juxt, dependencie: Vec<Juxt>) -> Result<String, Box<dyn Error>> {
     let tokens = tokenizer::tokenize(&main.template)?;
     let tree = tree_builder::build_tree(&tokens);
-    let compiled_dependencies = compile_dependencies(&dependencie)?;
-    let compiled_main = evaluator::generate_js("execute", "context", &tree, compiled_dependencies);
+    let dependecies_nodex = compile_dependencies(&dependencie)?;
+    let compiled_main = Compiler {
+        imports: dependecies_nodex,
+    }
+    .generate_js("execute", "context", &tree);
     return compiled_main;
 }
 
@@ -36,13 +39,14 @@ fn compile_dependencies(juxts: &Vec<Juxt>) -> Result<Vec<Import>, Box<dyn Error>
         let tokens = tokenizer::tokenize(&juxt.template)?;
         let tree = tree_builder::build_tree(&tokens);
         let (extension, name) = split_name(&juxt.name)?;
-        let compiled_juxt = match extension {
-            "js" => Import {name: juxt.name.to_string(), content: juxt.template.clone()},
-            "juxt" => Import {name: juxt.name.to_string(), content: evaluator::generate_js(name, "context", &tree, Vec::new())?},
-            _ => return Err(format!("Extension {} not supported", extension).into()),
-        };
 
-        compiled.push(compiled_juxt);
+        compiled.push(Import {
+            file_name: juxt.name.to_string(),
+            name: name.to_string(),
+            extension: extension.to_string(),
+            orginial_value: juxt.template.to_string(),
+            content: tree,
+        });
     }
     return Ok(compiled);
 }

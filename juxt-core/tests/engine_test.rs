@@ -126,6 +126,36 @@ fn test_import_script() {
 }
 
 #[test]
+fn test_nested_import_script() {
+    let script = Juxt {
+        name: "script.js".to_string(),
+        template: "function getPort() {
+        return 80;
+    }"
+            .to_string(),
+    };
+
+    let component = Juxt {
+        name: "component.juxt".to_string(),
+        template: "{#import script.js}${getPort()}"
+            .to_string(),
+    };
+
+    let template = "{#import component.juxt}
+    ${component()}";
+    let result = compile_and_execute(
+        Juxt {
+            name: "main".to_string(),
+            template: template.to_string(),
+        },
+        vec![component, script],
+        String::new(),
+    )
+        .unwrap();
+    assert_eq!(result, "    80");
+}
+
+#[test]
 fn test_if() {
     let template = "{#if 1 == 1}\
     asd\
