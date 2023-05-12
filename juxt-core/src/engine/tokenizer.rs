@@ -131,7 +131,12 @@ fn next_token(pointer: usize, val: &str) -> Result<(usize, Token), Box<dyn Error
     }
 
     if val[pointer..].starts_with("//") {
-        let end_of_line = val[pointer..].find('\n').unwrap_or(val.len()) + pointer;
+        let mut end_of_line = val[pointer..].find('\n').unwrap_or(val.len());
+
+        if end_of_line != val.len() {
+            end_of_line = end_of_line + pointer;
+        }
+
         return Ok((
             end_of_line,
             Token {
@@ -144,7 +149,7 @@ fn next_token(pointer: usize, val: &str) -> Result<(usize, Token), Box<dyn Error
 
     let mut content = String::from(get_char_at(pointer, val)?);
     pointer = pointer + 1;
-    while pointer < val.len() && get_char_at(pointer, val)? != '{' {
+    while pointer < val.len() && get_char_at(pointer, val)? != '{' && !val[pointer..].starts_with("//"){
         content = vec![content, String::from(get_char_at(pointer, val)?)].join("");
         pointer = pointer + 1;
     }

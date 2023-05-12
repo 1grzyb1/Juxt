@@ -241,7 +241,7 @@ fn test_context() {
 
 #[test]
 fn test_comment() {
-    let template = "// bla bla";
+    let template = "sfd// bla bla";
     let result = compile_and_execute(
         Juxt {
             name: "main".to_string(),
@@ -251,5 +251,5 @@ fn test_comment() {
         String::from("{\"test\": \"hi\"}"),
     )
         .unwrap();
-    assert_eq!(result, "");
+    assert_eq!(result, "sfd");
 }
