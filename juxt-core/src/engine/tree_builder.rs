@@ -12,6 +12,7 @@ pub fn build_tree(tokens: &Vec<Token>) -> Vec<Node> {
     let mut i = 0;
     while i < tokens.len() {
         let token = tokens.get(i).unwrap().clone();
+
         let (new_i, node) = match token.tag_status {
             TagStatus::Open => tree(i, tokens, 1.0),
             TagStatus::Close => panic!("Unexpected close tag: {:?}", token),

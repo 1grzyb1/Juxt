@@ -237,3 +237,19 @@ fn test_context() {
     .unwrap();
     assert_eq!(result, "hi");
 }
+
+
+#[test]
+fn test_comment() {
+    let template = "// bla bla";
+    let result = compile_and_execute(
+        Juxt {
+            name: "main".to_string(),
+            template: template.to_string(),
+        },
+        Vec::new(),
+        String::from("{\"test\": \"hi\"}"),
+    )
+        .unwrap();
+    assert_eq!(result, "");
+}

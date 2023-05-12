@@ -8,6 +8,7 @@ pub enum TokenType {
     Content,
     If,
     Else,
+    Comment
 }
 
 #[derive(PartialEq, Debug, Clone)]
@@ -127,6 +128,18 @@ fn next_token(pointer: usize, val: &str) -> Result<(usize, Token), Box<dyn Error
         if !matches!(token.token_type, TokenType::Content) {
             return Ok((new_pointer, token));
         }
+    }
+
+    if val[pointer..].starts_with("//") {
+        let end_of_line = val[pointer..].find('\n').unwrap_or(val.len()) + pointer;
+        return Ok((
+            end_of_line,
+            Token {
+                value: val[pointer+2..end_of_line].to_string(),
+                token_type: TokenType::Comment,
+                tag_status: TagStatus::Undefined,
+            }
+        ));
     }
 
     let mut content = String::from(get_char_at(pointer, val)?);

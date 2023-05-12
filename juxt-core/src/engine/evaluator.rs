@@ -50,7 +50,8 @@ impl Compiler {
                 TokenType::Content => content.push_str(&node.token_value),
                 TokenType::Each => self.handle_each(&mut functions, &mut content, node)?,
                 TokenType::If => self.handle_if(&mut functions, &mut content, i, nodes)?,
-                TokenType::Else => { /* Ignore, handled in if match */ }
+                TokenType::Else => { /* Ignore, handled in if */ }
+                TokenType::Comment => { /* Ignore */ }
             }
         }
 
@@ -86,20 +87,18 @@ impl Compiler {
         let import_name = node.token_value.clone();
         let import = self.imports.iter().find(|i| i.file_name == import_name);
         match import {
-            Some(import) => {
-                match import.extension.as_str() {
-                    "juxt" => {
-                        let js = self.generate_js(&import.name, "context", &import.content)?;
-                        functions.push(js);
-                        Ok(())
-                    }
-                    "js" => {
-                        functions.push(import.orginial_value.clone());
-                        Ok(())
-                    }
-                    _ => return Err(format!("Unknown extension {}", import.extension).into()),
+            Some(import) => match import.extension.as_str() {
+                "juxt" => {
+                    let js = self.generate_js(&import.name, "context", &import.content)?;
+                    functions.push(js);
+                    Ok(())
                 }
-            }
+                "js" => {
+                    functions.push(import.orginial_value.clone());
+                    Ok(())
+                }
+                _ => return Err(format!("Unknown extension {}", import.extension).into()),
+            },
             None => Err(format!("Import {} not found", import_name).into()),
         }
     }
